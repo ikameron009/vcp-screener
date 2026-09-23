@@ -1,0 +1,10 @@
+# 秘密情報は絶対にコミットしない
+service_account.json
+edinetdb_key.txt
+*.key
+
+# 中間生成物
+*.pkl
+__pycache__/
+*.pyc
+logs/

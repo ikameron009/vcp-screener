@@ -1,0 +1,72 @@
+name: VCP screen (7:00 JST)
+
+on:
+  schedule:
+    # 22:00 UTC = 07:00 JST。UTCの日-木 = JSTの月-金(取引日)。
+    # ※GitHubの定時cronは混雑で数十分〜数時間遅れることがある(無料枠の仕様)。
+    - cron: '0 22 * * 0-4'
+  workflow_dispatch:        # 手動実行(検証・臨時更新)
+
+concurrency:
+  group: vcp-screen
+  cancel-in-progress: false
+
+jobs:
+  screen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      # ---- 米国株: トレンドテンプレ+VCP+成長(EDGAR)+自作DV → JSON追記 ----
+      - name: US screen + export
+        run: |
+          python minervini_screener.py --universe nyse_nasdaq --rs-min 70 --growth --deepvue --out us_today || echo "US screen degraded"
+          python export_vcp_json.py --market US --csv us_today.csv --out vcp_us_history.json || echo "US export failed"
+
+      # ---- 日本株: JPXユニバース+トレンドテンプレ+VCP+自作DV(+任意で成長EDINET) → JSON追記 ----
+      - name: JP screen + export
+        env:
+          EDINETDB_API_KEY: ${{ secrets.EDINETDB_API_KEY }}
+        run: |
+          python build_jp_universe.py || echo "jp universe failed"
+          python minervini_screener.py --universe jp_universe.txt --rs-min 70 --deepvue --dv-dvol 1e9 --dv-ret3m 0.25 --out jp_today || echo "JP screen degraded"
+          if [ -n "${EDINETDB_API_KEY}" ]; then
+            python jp_growth.py --csv jp_today.csv --min-rev 15 --min-eps 15 || echo "jp growth failed"
+          else
+            echo "EDINETDB_API_KEY 未設定 → 増収増益フィルタはスキップ(トレンド+VCPのみで出力)"
+          fi
+          python export_vcp_json.py --market JP --csv jp_today.csv --out vcp_jp_history.json || echo "JP export failed"
+
+      # ---- 履歴を自リポにコミット(次回に半年分を積み上げるため) ----
+      - name: Persist history
+        run: |
+          git config user.name "vcp-bot"
+          git config user.email "vcp-bot@users.noreply.github.com"
+          git add vcp_us_history.json vcp_jp_history.json
+          git commit -m "history $(date -u +%F)" || echo "no history change"
+          git push || echo "history push skipped"
+
+      # ---- 結果JSONだけ公開リポ theme-flow へ送る(=ページが表示。コードは非公開のまま) ----
+      - name: Publish JSON to theme-flow
+        env:
+          TF_TOKEN: ${{ secrets.THEMEFLOW_TOKEN }}
+        run: |
+          if [ -z "${TF_TOKEN}" ]; then echo "THEMEFLOW_TOKEN 未設定 → 公開サイトへの反映はスキップ"; exit 0; fi
+          git clone --depth 1 "https://x-access-token:${TF_TOKEN}@github.com/ikameron009/theme-flow.git" tf
+          cp vcp_us_history.json tf/vcp_us.json
+          cp vcp_jp_history.json tf/vcp_jp.json
+          cd tf
+          git config user.name "vcp-bot"
+          git config user.email "vcp-bot@users.noreply.github.com"
+          git add vcp_us.json vcp_jp.json
+          git commit -m "VCP screener update $(date -u +%F)" || { echo "no change"; exit 0; }
+          git push

@@ -1,0 +1,362 @@
+{
+ "AAPL": {
+  "n": "Apple Inc.",
+  "s": "Technology"
+ },
+ "ADM": {
+  "n": "Archer-Daniels-Midland Company",
+  "s": "Consumer Defensive"
+ },
+ "AEP": {
+  "n": "American Electric Power Company",
+  "s": "Utilities"
+ },
+ "AIZ": {
+  "n": "Assurant, Inc.",
+  "s": "Financial Services"
+ },
+ "ALL": {
+  "n": "Allstate Corporation (The)",
+  "s": "Financial Services"
+ },
+ "AMAT": {
+  "n": "Applied Materials, Inc.",
+  "s": "Technology"
+ },
+ "AMD": {
+  "n": "Advanced Micro Devices, Inc.",
+  "s": "Technology"
+ },
+ "AME": {
+  "n": "AMETEK, Inc.",
+  "s": "Industrials"
+ },
+ "ANET": {
+  "n": "Arista Networks, Inc.",
+  "s": "Technology"
+ },
+ "APH": {
+  "n": "Amphenol Corporation",
+  "s": "Technology"
+ },
+ "BAC": {
+  "n": "Bank of America Corporation",
+  "s": "Financial Services"
+ },
+ "BEN": {
+  "n": "Franklin Resources, Inc.",
+  "s": "Financial Services"
+ },
+ "BIIB": {
+  "n": "Biogen Inc.",
+  "s": "Healthcare"
+ },
+ "BNY": {
+  "n": "The Bank of New York Mellon Cor",
+  "s": "Financial Services"
+ },
+ "C": {
+  "n": "Citigroup, Inc.",
+  "s": "Financial Services"
+ },
+ "CAT": {
+  "n": "Caterpillar, Inc.",
+  "s": "Industrials"
+ },
+ "CFG": {
+  "n": "Citizens Financial Group, Inc.",
+  "s": "Financial Services"
+ },
+ "CHRW": {
+  "n": "C.H. Robinson Worldwide, Inc.",
+  "s": "Industrials"
+ },
+ "CNC": {
+  "n": "Centene Corporation",
+  "s": "Healthcare"
+ },
+ "CRL": {
+  "n": "Charles River Laboratories Inte",
+  "s": "Healthcare"
+ },
+ "CSCO": {
+  "n": "Cisco Systems, Inc.",
+  "s": "Technology"
+ },
+ "CSX": {
+  "n": "CSX Corporation",
+  "s": "Industrials"
+ },
+ "CVS": {
+  "n": "CVS Health Corporation",
+  "s": "Healthcare"
+ },
+ "DAL": {
+  "n": "Delta Air Lines, Inc.",
+  "s": "Industrials"
+ },
+ "DELL": {
+  "n": "Dell Technologies Inc.",
+  "s": "Technology"
+ },
+ "DVA": {
+  "n": "DaVita Inc.",
+  "s": "Healthcare"
+ },
+ "EA": {
+  "n": "Electronic Arts Inc.",
+  "s": "Communication Services"
+ },
+ "EBAY": {
+  "n": "eBay Inc.",
+  "s": "Consumer Cyclical"
+ },
+ "EIX": {
+  "n": "Edison International",
+  "s": "Utilities"
+ },
+ "ETR": {
+  "n": "Entergy Corporation",
+  "s": "Utilities"
+ },
+ "EXPD": {
+  "n": "Expeditors International of Was",
+  "s": "Industrials"
+ },
+ "FFIV": {
+  "n": "F5, Inc.",
+  "s": "Technology"
+ },
+ "FITB": {
+  "n": "Fifth Third Bancorp",
+  "s": "Financial Services"
+ },
+ "FLEX": {
+  "n": "Flex Ltd.",
+  "s": "Technology"
+ },
+ "FRT": {
+  "n": "Federal Realty Investment Trust",
+  "s": "Real Estate"
+ },
+ "FTNT": {
+  "n": "Fortinet, Inc.",
+  "s": "Technology"
+ },
+ "GE": {
+  "n": "GE Aerospace",
+  "s": "Industrials"
+ },
+ "GEV": {
+  "n": "GE Vernova Inc.",
+  "s": "Industrials"
+ },
+ "GL": {
+  "n": "Globe Life Inc.",
+  "s": "Financial Services"
+ },
+ "GS": {
+  "n": "Goldman Sachs Group, Inc. (The)",
+  "s": "Financial Services"
+ },
+ "GWW": {
+  "n": "W.W. Grainger, Inc.",
+  "s": "Industrials"
+ },
+ "HPE": {
+  "n": "Hewlett Packard Enterprise Comp",
+  "s": "Technology"
+ },
+ "HST": {
+  "n": "Host Hotels & Resorts, Inc.",
+  "s": "Real Estate"
+ },
+ "HWM": {
+  "n": "Howmet Aerospace Inc.",
+  "s": "Industrials"
+ },
+ "IBKR": {
+  "n": "Interactive Brokers Group, Inc.",
+  "s": "Financial Services"
+ },
+ "INCY": {
+  "n": "Incyte Corporation",
+  "s": "Healthcare"
+ },
+ "IVZ": {
+  "n": "Invesco Ltd",
+  "s": "Financial Services"
+ },
+ "JBHT": {
+  "n": "J.B. Hunt Transport Services, I",
+  "s": "Industrials"
+ },
+ "JCI": {
+  "n": "Johnson Controls International",
+  "s": "Industrials"
+ },
+ "JNJ": {
+  "n": "Johnson & Johnson",
+  "s": "Healthcare"
+ },
+ "KEY": {
+  "n": "KeyCorp",
+  "s": "Financial Services"
+ },
+ "KLAC": {
+  "n": "KLA Corporation",
+  "s": "Technology"
+ },
+ "LLY": {
+  "n": "Eli Lilly and Company",
+  "s": "Healthcare"
+ },
+ "LRCX": {
+  "n": "Lam Research Corporation",
+  "s": "Technology"
+ },
+ "LUV": {
+  "n": "Southwest Airlines Company",
+  "s": "Industrials"
+ },
+ "MAR": {
+  "n": "Marriott International",
+  "s": "Consumer Cyclical"
+ },
+ "MNST": {
+  "n": "Monster Beverage Corporation",
+  "s": "Consumer Defensive"
+ },
+ "MO": {
+  "n": "Altria Group, Inc.",
+  "s": "Consumer Defensive"
+ },
+ "MPC": {
+  "n": "Marathon Petroleum Corporation",
+  "s": "Energy"
+ },
+ "MRK": {
+  "n": "Merck & Company, Inc.",
+  "s": "Healthcare"
+ },
+ "MRNA": {
+  "n": "Moderna, Inc.",
+  "s": "Healthcare"
+ },
+ "MS": {
+  "n": "Morgan Stanley",
+  "s": "Financial Services"
+ },
+ "MU": {
+  "n": "Micron Technology, Inc.",
+  "s": "Technology"
+ },
+ "NTAP": {
+  "n": "NetApp, Inc.",
+  "s": "Technology"
+ },
+ "NTRS": {
+  "n": "Northern Trust Corporation",
+  "s": "Financial Services"
+ },
+ "ODFL": {
+  "n": "Old Dominion Freight Line, Inc.",
+  "s": "Industrials"
+ },
+ "PFG": {
+  "n": "Principal Financial Group Inc",
+  "s": "Financial Services"
+ },
+ "PNC": {
+  "n": "PNC Financial Services Group, I",
+  "s": "Financial Services"
+ },
+ "PSX": {
+  "n": "Phillips 66",
+  "s": "Energy"
+ },
+ "RF": {
+  "n": "Regions Financial Corporation",
+  "s": "Financial Services"
+ },
+ "RL": {
+  "n": "Ralph Lauren Corporation",
+  "s": "Consumer Cyclical"
+ },
+ "ROK": {
+  "n": "Rockwell Automation, Inc.",
+  "s": "Industrials"
+ },
+ "SNA": {
+  "n": "Snap-On Incorporated",
+  "s": "Industrials"
+ },
+ "SNDK": {
+  "n": "Sandisk Corporation",
+  "s": "Technology"
+ },
+ "SPG": {
+  "n": "Simon Property Group, Inc.",
+  "s": "Real Estate"
+ },
+ "SRE": {
+  "n": "DBA Sempra",
+  "s": "Utilities"
+ },
+ "STT": {
+  "n": "State Street Corporation",
+  "s": "Financial Services"
+ },
+ "STX": {
+  "n": "Seagate Technology Holdings PLC",
+  "s": "Technology"
+ },
+ "TGT": {
+  "n": "Target Corporation",
+  "s": "Consumer Defensive"
+ },
+ "TRGP": {
+  "n": "Targa Resources, Inc.",
+  "s": "Energy"
+ },
+ "TRV": {
+  "n": "The Travelers Companies, Inc.",
+  "s": "Financial Services"
+ },
+ "TXN": {
+  "n": "Texas Instruments Incorporated",
+  "s": "Technology"
+ },
+ "UAL": {
+  "n": "United Airlines Holdings, Inc.",
+  "s": "Industrials"
+ },
+ "USB": {
+  "n": "U.S. Bancorp",
+  "s": "Financial Services"
+ },
+ "VLO": {
+  "n": "Valero Energy Corporation",
+  "s": "Energy"
+ },
+ "VTR": {
+  "n": "Ventas, Inc.",
+  "s": "Real Estate"
+ },
+ "VTRS": {
+  "n": "Viatris Inc.",
+  "s": "Healthcare"
+ },
+ "WELL": {
+  "n": "Welltower Inc.",
+  "s": "Real Estate"
+ },
+ "WMB": {
+  "n": "Williams Companies, Inc. (The)",
+  "s": "Energy"
+ },
+ "WST": {
+  "n": "West Pharmaceutical Services, I",
+  "s": "Healthcare"
+ }
+}

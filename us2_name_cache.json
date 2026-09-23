@@ -1,0 +1,1410 @@
+{
+"SNDK": {
+"n": "Sandisk Corporation",
+"s": "Technology"
+},
+"MU": {
+"n": "Micron Technology, Inc.",
+"s": "Technology"
+},
+"AMD": {
+"n": "Advanced Micro Devices, Inc.",
+"s": "Technology"
+},
+"DELL": {
+"n": "Dell Technologies Inc.",
+"s": "Technology"
+},
+"STX": {
+"n": "Seagate Technology Holdings PLC",
+"s": "Technology"
+},
+"FTNT": {
+"n": "Fortinet, Inc.",
+"s": "Technology"
+},
+"LRCX": {
+"n": "Lam Research Corporation",
+"s": "Technology"
+},
+"FROG": {
+"n": "JFrog Ltd.",
+"s": "Technology"
+},
+"VCYT": {
+"n": "Veracyte, Inc.",
+"s": "Healthcare"
+},
+"CAT": {
+"n": "Caterpillar, Inc.",
+"s": "Industrials"
+},
+"KRYS": {
+"n": "Krystal Biotech, Inc.",
+"s": "Healthcare"
+},
+"CVS": {
+"n": "CVS Health Corporation",
+"s": "Healthcare"
+},
+"NTRA": {
+"n": "Natera, Inc.",
+"s": "Healthcare"
+},
+"WST": {
+"n": "West Pharmaceutical Services, I",
+"s": "Healthcare"
+},
+"MNST": {
+"n": "Monster Beverage Corporation",
+"s": "Consumer Defensive"
+},
+"ANET": {
+"n": "Arista Networks, Inc.",
+"s": "Technology"
+},
+"SCCO": {
+"n": "SCCO",
+"s": ""
+},
+"PRM": {
+"n": "PRM",
+"s": ""
+},
+"URGN": {
+"n": "URGN",
+"s": ""
+},
+"PAYS": {
+"n": "PAYS",
+"s": ""
+},
+"NESR": {
+"n": "NESR",
+"s": ""
+},
+"BATRA": {
+"n": "BATRA",
+"s": ""
+},
+"DCOM": {
+"n": "DCOM",
+"s": ""
+},
+"RBB": {
+"n": "RBB",
+"s": ""
+},
+"KNSA": {
+"n": "KNSA",
+"s": ""
+},
+"LPG": {
+"n": "LPG",
+"s": ""
+},
+"OSCR": {
+"n": "OSCR",
+"s": ""
+},
+"AHR": {
+"n": "AHR",
+"s": ""
+},
+"ZETA": {
+"n": "ZETA",
+"s": ""
+},
+"INSW": {
+"n": "INSW",
+"s": ""
+},
+"LFST": {
+"n": "LFST",
+"s": ""
+},
+"RSI": {
+"n": "RSI",
+"s": ""
+},
+"GHM": {
+"n": "GHM",
+"s": ""
+},
+"XMTR": {
+"n": "XMTR",
+"s": ""
+},
+"VIRT": {
+"n": "VIRT",
+"s": ""
+},
+"ACRS": {
+"n": "ACRS",
+"s": ""
+},
+"WDC": {
+"n": "WDC",
+"s": ""
+},
+"BATRK": {
+"n": "BATRK",
+"s": ""
+},
+"KRNY": {
+"n": "KRNY",
+"s": ""
+},
+"AAMI": {
+"n": "AAMI",
+"s": ""
+},
+"ATLC": {
+"n": "ATLC",
+"s": ""
+},
+"QCRH": {
+"n": "QCRH",
+"s": ""
+},
+"PENG": {
+"n": "PENG",
+"s": ""
+},
+"CGNX": {
+"n": "CGNX",
+"s": ""
+},
+"WLFC": {
+"n": "WLFC",
+"s": ""
+},
+"RELY": {
+"n": "RELY",
+"s": ""
+},
+"LINC": {
+"n": "LINC",
+"s": ""
+},
+"AMN": {
+"n": "AMN",
+"s": ""
+},
+"AIR": {
+"n": "AIR",
+"s": ""
+},
+"MET": {
+"n": "MET",
+"s": ""
+},
+"KYMR": {
+"n": "KYMR",
+"s": ""
+},
+"MAMA": {
+"n": "MAMA",
+"s": ""
+},
+"CRDO": {
+"n": "CRDO",
+"s": ""
+},
+"ABSI": {
+"n": "ABSI",
+"s": ""
+},
+"SIF": {
+"n": "SIF",
+"s": ""
+},
+"BFLY": {
+"n": "BFLY",
+"s": ""
+},
+"DOC": {
+"n": "DOC",
+"s": ""
+},
+"WSFS": {
+"n": "WSFS",
+"s": ""
+},
+"VCTR": {
+"n": "VCTR",
+"s": ""
+},
+"NBIX": {
+"n": "NBIX",
+"s": ""
+},
+"BTSG": {
+"n": "BTSG",
+"s": ""
+},
+"LQDA": {
+"n": "LQDA",
+"s": ""
+},
+"PRSU": {
+"n": "PRSU",
+"s": ""
+},
+"WTS": {
+"n": "WTS",
+"s": ""
+},
+"PGC": {
+"n": "PGC",
+"s": ""
+},
+"CXW": {
+"n": "CXW",
+"s": ""
+},
+"SEZL": {
+"n": "SEZL",
+"s": ""
+},
+"WDFC": {
+"n": "WDFC",
+"s": ""
+},
+"FRD": {
+"n": "FRD",
+"s": ""
+},
+"BDSX": {
+"n": "BDSX",
+"s": ""
+},
+"EOG": {
+"n": "EOG",
+"s": ""
+},
+"ROST": {
+"n": "ROST",
+"s": ""
+},
+"EZPW": {
+"n": "EZPW",
+"s": ""
+},
+"AUPH": {
+"n": "AUPH",
+"s": ""
+},
+"CRNX": {
+"n": "Crinetics Pharmaceuticals, Inc.",
+"s": "Healthcare"
+},
+"MVBF": {
+"n": "MVB Financial Corp.",
+"s": "Financial Services"
+},
+"NTST": {
+"n": "NetSTREIT Corp.",
+"s": "Real Estate"
+},
+"HALO": {
+"n": "Halozyme Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"VVV": {
+"n": "Valvoline Inc.",
+"s": "Consumer Cyclical"
+},
+"IOVA": {
+"n": "Iovance Biotherapeutics, Inc.",
+"s": "Healthcare"
+},
+"DDOG": {
+"n": "Datadog, Inc.",
+"s": "Technology"
+},
+"PKE": {
+"n": "Park Aerospace Corp.",
+"s": "Industrials"
+},
+"ARW": {
+"n": "Arrow Electronics, Inc.",
+"s": "Technology"
+},
+"COCO": {
+"n": "The Vita Coco Company, Inc.",
+"s": "Consumer Defensive"
+},
+"IRM": {
+"n": "Iron Mountain Incorporated (Del",
+"s": "Real Estate"
+},
+"VVX": {
+"n": "V2X, Inc.",
+"s": "Industrials"
+},
+"COMP": {
+"n": "Compass, Inc.",
+"s": "Real Estate"
+},
+"CRGY": {
+"n": "Crescent Energy Company",
+"s": "Energy"
+},
+"OVV": {
+"n": "Ovintiv Inc. (DE)",
+"s": "Energy"
+},
+"KALU": {
+"n": "Kaiser Aluminum Corporation",
+"s": "Basic Materials"
+},
+"NUE": {
+"n": "Nucor Corporation",
+"s": "Basic Materials"
+},
+"ENVA": {
+"n": "Enova International, Inc.",
+"s": "Financial Services"
+},
+"MLAB": {
+"n": "Mesa Laboratories, Inc.",
+"s": "Technology"
+},
+"HUT": {
+"n": "Hut 8 Corp.",
+"s": "Financial Services"
+},
+"NVEC": {
+"n": "NVE Corporation",
+"s": "Technology"
+},
+"BGC": {
+"n": "BGC Group, Inc.",
+"s": "Financial Services"
+},
+"PECO": {
+"n": "Phillips Edison & Company, Inc.",
+"s": "Real Estate"
+},
+"HEI": {
+"n": "Heico Corporation",
+"s": "Industrials"
+},
+"CPAY": {
+"n": "Corpay, Inc.",
+"s": "Technology"
+},
+"AFL": {
+"n": "AFLAC Incorporated",
+"s": "Financial Services"
+},
+"PLUS": {
+"n": "ePlus inc.",
+"s": "Technology"
+},
+"NET": {
+"n": "Cloudflare, Inc.",
+"s": "Technology"
+},
+"LWAY": {
+"n": "Lifeway Foods, Inc.",
+"s": "Consumer Defensive"
+},
+"NUVB": {
+"n": "Nuvation Bio Inc.",
+"s": "Healthcare"
+},
+"ACVA": {
+"n": "ACV Auctions Inc.",
+"s": "Consumer Cyclical"
+},
+"PTRN": {
+"n": "Pattern Group Inc. - Series A",
+"s": "Technology"
+},
+"AGEN": {
+"n": "Agenus Inc.",
+"s": "Healthcare"
+},
+"SYRE": {
+"n": "Spyre Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"ADPT": {
+"n": "Adaptive Biotechnologies Corpor",
+"s": "Healthcare"
+},
+"MEDP": {
+"n": "Medpace Holdings, Inc.",
+"s": "Healthcare"
+},
+"GH": {
+"n": "Guardant Health, Inc.",
+"s": "Healthcare"
+},
+"QLYS": {
+"n": "Qualys, Inc.",
+"s": "Technology"
+},
+"TRAX": {
+"n": "First Tracks Biotherapeutics, I",
+"s": "Healthcare"
+},
+"ILMN": {
+"n": "Illumina, Inc.",
+"s": "Healthcare"
+},
+"RYZ": {
+"n": "Ryerson Holding Corporation",
+"s": "Industrials"
+},
+"CTAS": {
+"n": "Cintas Corporation",
+"s": "Industrials"
+},
+"RLAY": {
+"n": "Relay Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"PYPL": {
+"n": "PayPal Holdings, Inc.",
+"s": "Financial Services"
+},
+"ESTA": {
+"n": "Establishment Labs Holdings Inc",
+"s": "Healthcare"
+},
+"PSNL": {
+"n": "Personalis, Inc.",
+"s": "Healthcare"
+},
+"RLJ": {
+"n": "RLJ Lodging Trust",
+"s": "Real Estate"
+},
+"PDLB": {
+"n": "Ponce Financial Group, Inc.",
+"s": "Financial Services"
+},
+"QTTB": {
+"n": "Q32 Bio Inc.",
+"s": "Healthcare"
+},
+"TENB": {
+"n": "Tenable Holdings, Inc.",
+"s": "Technology"
+},
+"TCMD": {
+"n": "Tactile Systems Technology, Inc",
+"s": "Healthcare"
+},
+"GENI": {
+"n": "Genius Sports Limited",
+"s": "Communication Services"
+},
+"CDNA": {
+"n": "CareDx, Inc.",
+"s": "Healthcare"
+},
+"RNG": {
+"n": "Ringcentral, Inc.",
+"s": "Technology"
+},
+"WKC": {
+"n": "World Kinect Corporation",
+"s": "Energy"
+},
+"TXG": {
+"n": "10x Genomics, Inc.",
+"s": "Healthcare"
+},
+"FBRX": {
+"n": "Forte Biosciences, Inc.",
+"s": "Healthcare"
+},
+"MAN": {
+"n": "ManpowerGroup",
+"s": "Industrials"
+},
+"UTZ": {
+"n": "Utz Brands Inc",
+"s": "Consumer Defensive"
+},
+"MNPR": {
+"n": "Monopar Therapeutics Inc.",
+"s": "Healthcare"
+},
+"VEEE": {
+"n": "Twin Vee PowerCats Co.",
+"s": "Consumer Cyclical"
+},
+"DAVA": {
+"n": "Endava plc",
+"s": "Technology"
+},
+"ATAI": {
+"n": "AtaiBeckley Inc.",
+"s": "Healthcare"
+},
+"RHI": {
+"n": "Robert Half Inc.",
+"s": "Industrials"
+},
+"NXTC": {
+"n": "NextCure, Inc.",
+"s": "Healthcare"
+},
+"STNG": {
+"n": "Scorpio Tankers Inc.",
+"s": "Energy"
+},
+"DAVE": {
+"n": "Dave Inc.",
+"s": "Technology"
+},
+"PLPC": {
+"n": "Preformed Line Products Company",
+"s": "Industrials"
+},
+"TGTX": {
+"n": "TG Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"APH": {
+"n": "Amphenol Corporation",
+"s": "Technology"
+},
+"ICUI": {
+"n": "ICU Medical, Inc.",
+"s": "Healthcare"
+},
+"PGNY": {
+"n": "Progyny, Inc.",
+"s": "Healthcare"
+},
+"CRWD": {
+"n": "CrowdStrike Holdings, Inc.",
+"s": "Technology"
+},
+"NAVN": {
+"n": "Navan, Inc.",
+"s": "Technology"
+},
+"WHD": {
+"n": "Cactus, Inc. Class A Common Sto",
+"s": "Energy"
+},
+"DINO": {
+"n": "HF Sinclair Corporation",
+"s": "Energy"
+},
+"IESC": {
+"n": "IES Holdings, Inc.",
+"s": "Industrials"
+},
+"DK": {
+"n": "Delek US Holdings, Inc.",
+"s": "Energy"
+},
+"MYFW": {
+"n": "First Western Financial, Inc.",
+"s": "Financial Services"
+},
+"CON": {
+"n": "Concentra Group Holdings Parent",
+"s": "Healthcare"
+},
+"CBRL": {
+"n": "Cracker Barrel Old Country Stor",
+"s": "Consumer Cyclical"
+},
+"MEOH": {
+"n": "Methanex Corporation",
+"s": "Basic Materials"
+},
+"CAKE": {
+"n": "The Cheesecake Factory Incorpor",
+"s": "Consumer Cyclical"
+},
+"OPY": {
+"n": "Oppenheimer Holdings, Inc.",
+"s": "Financial Services"
+},
+"UGP": {
+"n": "Ultrapar Participacoes S.A. (Ne",
+"s": "Energy"
+},
+"VSXY": {
+"n": "Victorias Secret & Co.",
+"s": "Consumer Cyclical"
+},
+"ASH": {
+"n": "Ashland Inc.",
+"s": "Basic Materials"
+},
+"AUR": {
+"n": "Aurora Innovation, Inc.",
+"s": "Consumer Cyclical"
+},
+"OII": {
+"n": "Oceaneering International, Inc.",
+"s": "Energy"
+},
+"VAC": {
+"n": "Marriott Vacations Worldwide Co",
+"s": "Consumer Cyclical"
+},
+"OKTA": {
+"n": "Okta, Inc.",
+"s": "Technology"
+},
+"PK": {
+"n": "Park Hotels & Resorts Inc.",
+"s": "Real Estate"
+},
+"PBF": {
+"n": "PBF Energy Inc.",
+"s": "Energy"
+},
+"CF": {
+"n": "CF Industries Holdings, Inc.",
+"s": "Basic Materials"
+},
+"BAX": {
+"n": "Baxter International Inc.",
+"s": "Healthcare"
+},
+"NRXS": {
+"n": "Neuraxis, Inc.",
+"s": "Healthcare"
+},
+"NVT": {
+"n": "nVent Electric plc",
+"s": "Industrials"
+},
+"BH": {
+"n": "Biglari Holdings Inc.",
+"s": "Consumer Cyclical"
+},
+"WNC": {
+"n": "Wabash National Corporation",
+"s": "Industrials"
+},
+"OUST": {
+"n": "Ouster, Inc.",
+"s": "Technology"
+},
+"UMAC": {
+"n": "Unusual Machines, Inc.",
+"s": "Technology"
+},
+"PEB": {
+"n": "Pebblebrook Hotel Trust",
+"s": "Real Estate"
+},
+"DXCM": {
+"n": "DexCom, Inc.",
+"s": "Healthcare"
+},
+"AMCR": {
+"n": "Amcor plc",
+"s": "Consumer Cyclical"
+},
+"BELFB": {
+"n": "Bel Fuse Inc.",
+"s": "Technology"
+},
+"CLS": {
+"n": "Celestica, Inc.",
+"s": "Technology"
+},
+"NEOG": {
+"n": "Neogen Corporation",
+"s": "Healthcare"
+},
+"AEIS": {
+"n": "Advanced Energy Industries, Inc",
+"s": "Industrials"
+},
+"SNX": {
+"n": "TD SYNNEX Corporation",
+"s": "Technology"
+},
+"SKWD": {
+"n": "Skyward Specialty Insurance Gro",
+"s": "Financial Services"
+},
+"FA": {
+"n": "First Advantage Corporation",
+"s": "Industrials"
+},
+"MTRN": {
+"n": "Materion Corporation",
+"s": "Basic Materials"
+},
+"PARR": {
+"n": "Par Pacific Holdings, Inc. Comm",
+"s": "Energy"
+},
+"IMVT": {
+"n": "Immunovant, Inc.",
+"s": "Healthcare"
+},
+"CNK": {
+"n": "Cinemark Holdings Inc Cinemark ",
+"s": "Communication Services"
+},
+"BJRI": {
+"n": "BJ's Restaurants, Inc.",
+"s": "Consumer Cyclical"
+},
+"BFH": {
+"n": "Bread Financial Holdings, Inc.",
+"s": "Financial Services"
+},
+"PNTG": {
+"n": "The Pennant Group, Inc.",
+"s": "Healthcare"
+},
+"ETON": {
+"n": "Eton Pharmaceuticals, Inc.",
+"s": "Healthcare"
+},
+"YOU": {
+"n": "Clear Secure, Inc.",
+"s": "Technology"
+},
+"DGII": {
+"n": "Digi International Inc.",
+"s": "Technology"
+},
+"IMAX": {
+"n": "Imax Corporation",
+"s": "Communication Services"
+},
+"DBRG": {
+"n": "DigitalBridge Group, Inc.",
+"s": "Financial Services"
+},
+"DLTR": {
+"n": "Dollar Tree, Inc.",
+"s": "Consumer Defensive"
+},
+"CIB": {
+"n": "Grupo Cibest S.A.",
+"s": "Financial Services"
+},
+"FSLY": {
+"n": "Fastly, Inc.",
+"s": "Technology"
+},
+"ULCC": {
+"n": "Frontier Group Holdings, Inc.",
+"s": "Industrials"
+},
+"ALKS": {
+"n": "Alkermes plc",
+"s": "Healthcare"
+},
+"WT": {
+"n": "WisdomTree, Inc.",
+"s": "Financial Services"
+},
+"BLBD": {
+"n": "Blue Bird Corporation",
+"s": "Industrials"
+},
+"LIND": {
+"n": "Lindblad Expeditions Holdings I",
+"s": "Consumer Cyclical"
+},
+"SUN": {
+"n": "Sunoco LP",
+"s": "Energy"
+},
+"NWL": {
+"n": "Newell Brands Inc.",
+"s": "Consumer Defensive"
+},
+"AMRX": {
+"n": "Amneal Pharmaceuticals, Inc.",
+"s": "Healthcare"
+},
+"WLY": {
+"n": "John Wiley & Sons, Inc.",
+"s": "Communication Services"
+},
+"ATKR": {
+"n": "Atkore Inc.",
+"s": "Industrials"
+},
+"TXRH": {
+"n": "Texas Roadhouse, Inc.",
+"s": "Consumer Cyclical"
+},
+"LEGH": {
+"n": "Legacy Housing Corporation",
+"s": "Consumer Cyclical"
+},
+"KNTK": {
+"n": "Kinetik Holdings Inc.",
+"s": "Energy"
+},
+"LASR": {
+"n": "nLIGHT, Inc.",
+"s": "Technology"
+},
+"PR": {
+"n": "Permian Resources Corporation",
+"s": "Energy"
+},
+"UFPT": {
+"n": "UFP Technologies, Inc.",
+"s": "Healthcare"
+},
+"NRIX": {
+"n": "Nurix Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"AGM": {
+"n": "Federal Agricultural Mortgage C",
+"s": "Financial Services"
+},
+"AEHR": {
+"n": "Aehr Test Systems",
+"s": "Technology"
+},
+"EE": {
+"n": "Excelerate Energy, Inc.",
+"s": "Energy"
+},
+"ORKA": {
+"n": "Oruka Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"LB": {
+"n": "LandBridge Company LLC",
+"s": "Energy"
+},
+"CHEF": {
+"n": "The Chefs' Warehouse, Inc.",
+"s": "Consumer Defensive"
+},
+"FTK": {
+"n": "Flotek Industries, Inc.",
+"s": "Energy"
+},
+"EAT": {
+"n": "Brinker International, Inc.",
+"s": "Consumer Cyclical"
+},
+"BLZE": {
+"n": "Backblaze, Inc.",
+"s": "Technology"
+},
+"REPX": {
+"n": "Riley Exploration Permian, Inc.",
+"s": "Energy"
+},
+"ERAS": {
+"n": "Erasca, Inc.",
+"s": "Healthcare"
+},
+"VSEC": {
+"n": "VSE Corporation",
+"s": "Industrials"
+},
+"ROKU": {
+"n": "Roku, Inc.",
+"s": "Communication Services"
+},
+"WSM": {
+"n": "Williams-Sonoma, Inc.",
+"s": "Consumer Cyclical"
+},
+"AXTA": {
+"n": "Axalta Coating Systems Ltd.",
+"s": "Basic Materials"
+},
+"SENEA": {
+"n": "Seneca Foods Corp.",
+"s": "Consumer Defensive"
+},
+"ATEX": {
+"n": "Anterix Inc.",
+"s": "Communication Services"
+},
+"HASI": {
+"n": "HA Sustainable Infrastructure C",
+"s": "Financial Services"
+},
+"TWLO": {
+"n": "Twilio Inc.",
+"s": "Technology"
+},
+"AMG": {
+"n": "Affiliated Managers Group, Inc.",
+"s": "Financial Services"
+},
+"CATY": {
+"n": "Cathay General Bancorp",
+"s": "Financial Services"
+},
+"CSW": {
+"n": "CSW Industrials, Inc.",
+"s": "Industrials"
+},
+"ONTO": {
+"n": "Onto Innovation Inc.",
+"s": "Technology"
+},
+"KINS": {
+"n": "Kingstone Companies, Inc",
+"s": "Financial Services"
+},
+"LGND": {
+"n": "Ligand Pharmaceuticals Incorpor",
+"s": "Healthcare"
+},
+"CMPS": {
+"n": "COMPASS Pathways Plc - American",
+"s": "Healthcare"
+},
+"SLS": {
+"n": "SELLAS Life Sciences Group, Inc",
+"s": "Healthcare"
+},
+"PVLA": {
+"n": "Palvella Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"CLMT": {
+"n": "Calumet, Inc",
+"s": "Basic Materials"
+},
+"FEIM": {
+"n": "Frequency Electronics, Inc.",
+"s": "Technology"
+},
+"ELVN": {
+"n": "Enliven Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"MBX": {
+"n": "MBX Biosciences, Inc.",
+"s": "Healthcare"
+},
+"DCO": {
+"n": "Ducommun Incorporated",
+"s": "Industrials"
+},
+"AVT": {
+"n": "Avnet, Inc.",
+"s": "Technology"
+},
+"BBIO": {
+"n": "BridgeBio Pharma, Inc.",
+"s": "Healthcare"
+},
+"DHT": {
+"n": "DHT Holdings, Inc.",
+"s": "Energy"
+},
+"BZH": {
+"n": "Beazer Homes USA, Inc.",
+"s": "Consumer Cyclical"
+},
+"TVTX": {
+"n": "Travere Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"APPS": {
+"n": "Digital Turbine, Inc.",
+"s": "Technology"
+},
+"ATI": {
+"n": "ATI Inc.",
+"s": "Industrials"
+},
+"CROX": {
+"n": "Crocs, Inc.",
+"s": "Consumer Cyclical"
+},
+"ALNT": {
+"n": "Allient Inc.",
+"s": "Technology"
+},
+"ITGR": {
+"n": "Integer Holdings Corporation",
+"s": "Healthcare"
+},
+"BLMN": {
+"n": "Bloomin' Brands, Inc.",
+"s": "Consumer Cyclical"
+},
+"SN": {
+"n": "SharkNinja, Inc.",
+"s": "Consumer Cyclical"
+},
+"SEPN": {
+"n": "Septerna, Inc.",
+"s": "Healthcare"
+},
+"PAGP": {
+"n": "Plains GP Holdings, L.P.",
+"s": "Energy"
+},
+"HPK": {
+"n": "HighPeak Energy, Inc.",
+"s": "Energy"
+},
+"SM": {
+"n": "SM Energy Company",
+"s": "Energy"
+},
+"PTGX": {
+"n": "Protagonist Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"LITE": {
+"n": "Lumentum Holdings Inc.",
+"s": "Technology"
+},
+"SAIC": {
+"n": "Science Applications Internatio",
+"s": "Technology"
+},
+"RVMD": {
+"n": "Revolution Medicines, Inc.",
+"s": "Healthcare"
+},
+"SKY": {
+"n": "Champion Homes, Inc.",
+"s": "Consumer Cyclical"
+},
+"VG": {
+"n": "Venture Global, Inc.",
+"s": "Energy"
+},
+"AEVA": {
+"n": "Aeva Technologies, Inc.",
+"s": "Technology"
+},
+"HNGE": {
+"n": "Hinge Health, Inc.",
+"s": "Healthcare"
+},
+"SITM": {
+"n": "SiTime Corporation",
+"s": "Technology"
+},
+"AVR": {
+"n": "Anteris Technologies Global Cor",
+"s": "Healthcare"
+},
+"VCEL": {
+"n": "Vericel Corporation",
+"s": "Healthcare"
+},
+"JRSH": {
+"n": "Jerash Holdings (US), Inc.",
+"s": "Consumer Cyclical"
+},
+"WEX": {
+"n": "WEX Inc.",
+"s": "Technology"
+},
+"TWST": {
+"n": "Twist Bioscience Corporation",
+"s": "Healthcare"
+},
+"ABCL": {
+"n": "AbCellera Biologics Inc.",
+"s": "Healthcare"
+},
+"HZO": {
+"n": "MarineMax, Inc.  (FL)",
+"s": "Consumer Cyclical"
+},
+"JHX": {
+"n": "James Hardie Industries plc.",
+"s": "Basic Materials"
+},
+"CUE": {
+"n": "Cue Biopharma, Inc.",
+"s": "Healthcare"
+},
+"KMX": {
+"n": "CarMax Inc",
+"s": "Consumer Cyclical"
+},
+"ATRO": {
+"n": "Astronics Corporation",
+"s": "Industrials"
+},
+"PGEN": {
+"n": "Precigen, Inc.",
+"s": "Healthcare"
+},
+"CRSR": {
+"n": "Corsair Gaming, Inc.",
+"s": "Technology"
+},
+"ETSY": {
+"n": "Etsy, Inc.",
+"s": "Consumer Cyclical"
+},
+"FORM": {
+"n": "FormFactor, Inc.",
+"s": "Technology"
+},
+"DXPE": {
+"n": "DXP Enterprises, Inc.",
+"s": "Industrials"
+},
+"6758": {
+"n": "6758",
+"s": ""
+},
+"THC": {
+"n": "Tenet Healthcare Corporation",
+"s": "Healthcare"
+},
+"ACOG": {
+"n": "Alpha Cognition Inc.",
+"s": "Healthcare"
+},
+"FTDR": {
+"n": "frontdoor, inc.",
+"s": "Consumer Cyclical"
+},
+"MPWR": {
+"n": "Monolithic Power Systems, Inc.",
+"s": "Technology"
+},
+"BELFA": {
+"n": "Bel Fuse Inc.",
+"s": "Technology"
+},
+"SLN": {
+"n": "Silence Therapeutics Plc - Amer",
+"s": "Healthcare"
+},
+"NSIT": {
+"n": "Insight Enterprises, Inc.",
+"s": "Technology"
+},
+"AMLX": {
+"n": "Amylyx Pharmaceuticals, Inc.",
+"s": "Healthcare"
+},
+"GEF": {
+"n": "Greif Inc.",
+"s": "Consumer Cyclical"
+},
+"NVDA": {
+"n": "NVIDIA Corporation",
+"s": "Technology"
+},
+"NBIS": {
+"n": "Nebius Group N.V.",
+"s": "Communication Services"
+},
+"FCFS": {
+"n": "FirstCash Holdings, Inc.",
+"s": "Financial Services"
+},
+"QMCO": {
+"n": "Quantum Corporation",
+"s": "Technology"
+},
+"FIX": {
+"n": "Comfort Systems USA, Inc.",
+"s": "Industrials"
+},
+"ECG": {
+"n": "Everus Construction Group, Inc.",
+"s": "Industrials"
+},
+"MTSI": {
+"n": "MACOM Technology Solutions Hold",
+"s": "Technology"
+},
+"KGS": {
+"n": "Kodiak Gas Services, Inc.",
+"s": "Energy"
+},
+"COHR": {
+"n": "Coherent Corp.",
+"s": "Technology"
+},
+"VREX": {
+"n": "Varex Imaging Corporation",
+"s": "Healthcare"
+},
+"EWTX": {
+"n": "Edgewise Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"IMNM": {
+"n": "Immunome, Inc.",
+"s": "Healthcare"
+},
+"FDMT": {
+"n": "4D Molecular Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"VOYG": {
+"n": "Voyager Technologies, Inc.",
+"s": "Industrials"
+},
+"FIVN": {
+"n": "Five9, Inc.",
+"s": "Technology"
+},
+"CLDX": {
+"n": "Celldex Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"DNTH": {
+"n": "Dianthus Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"FHTX": {
+"n": "Foghorn Therapeutics Inc.",
+"s": "Healthcare"
+},
+"GNK": {
+"n": "Genco Shipping & Trading Limite",
+"s": "Industrials"
+},
+"OC": {
+"n": "Owens Corning Inc",
+"s": "Industrials"
+},
+"MHK": {
+"n": "Mohawk Industries, Inc.",
+"s": "Consumer Cyclical"
+},
+"DFTX": {
+"n": "Definium Therapeutics, Inc.",
+"s": "Healthcare"
+},
+"LNG": {
+"n": "Cheniere Energy, Inc.",
+"s": "Energy"
+},
+"CBLL": {
+"n": "CeriBell, Inc.",
+"s": "Healthcare"
+},
+"SCHW": {
+"n": "Charles Schwab Corporation (The",
+"s": "Financial Services"
+},
+"TPC": {
+"n": "Tutor Perini Corporation",
+"s": "Industrials"
+},
+"PSTL": {
+"n": "Postal Realty Trust, Inc.",
+"s": "Real Estate"
+},
+"ZBRA": {
+"n": "Zebra Technologies Corporation",
+"s": "Technology"
+},
+"COP": {
+"n": "ConocoPhillips",
+"s": "Energy"
+},
+"TRMD": {
+"n": "TORM plc",
+"s": "Energy"
+},
+"CORT": {
+"n": "Corcept Therapeutics Incorporat",
+"s": "Healthcare"
+},
+"LTC": {
+"n": "LTC Properties, Inc.",
+"s": "Real Estate"
+},
+"HCC": {
+"n": "Warrior Met Coal, Inc.",
+"s": "Basic Materials"
+},
+"NVGS": {
+"n": "Navigator Holdings Ltd.",
+"s": "Energy"
+},
+"HPE": {
+"n": "Hewlett Packard Enterprise Comp",
+"s": "Technology"
+},
+"GENC": {
+"n": "Gencor Industries, Inc.",
+"s": "Industrials"
+},
+"FIVE": {
+"n": "Five Below, Inc.",
+"s": "Consumer Cyclical"
+},
+"P": {
+"n": "Everpure, Inc.",
+"s": "Technology"
+},
+"IBKR": {
+"n": "Interactive Brokers Group, Inc.",
+"s": "Financial Services"
+},
+"BE": {
+"n": "Bloom Energy Corporation",
+"s": "Industrials"
+},
+"RDVT": {
+"n": "Red Violet, Inc.",
+"s": "Technology"
+},
+"EPSN": {
+"n": "Epsilon Energy Ltd.",
+"s": "Energy"
+},
+"EGY": {
+"n": "VAALCO Energy, Inc.",
+"s": "Energy"
+},
+"SNOW": {
+"n": "Snowflake Inc.",
+"s": "Technology"
+},
+"SANM": {
+"n": "Sanmina Corporation",
+"s": "Technology"
+},
+"INCY": {
+"n": "Incyte Corporation",
+"s": "Healthcare"
+},
+"KURA": {
+"n": "Kura Oncology, Inc.",
+"s": "Healthcare"
+},
+"QNST": {
+"n": "QuinStreet, Inc.",
+"s": "Communication Services"
+},
+"KEYS": {
+"n": "Keysight Technologies Inc.",
+"s": "Technology"
+},
+"MUR": {
+"n": "Murphy Oil Corporation",
+"s": "Energy"
+},
+"MRVL": {
+"n": "Marvell Technology, Inc.",
+"s": "Technology"
+}
+}
