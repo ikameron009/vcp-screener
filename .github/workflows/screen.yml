@@ -1,11 +1,16 @@
-name: VCP screen (7:00 JST)
+name: VCP screen
 
 on:
   schedule:
-    # 22:00 UTC = 07:00 JST。UTCの日-木 = JSTの月-金(取引日)。
-    # ※GitHubの定時cronは混雑で数十分〜数時間遅れることがある(無料枠の仕様)。
-    - cron: '0 22 * * 0-4'
-  workflow_dispatch:        # 手動実行(検証・臨時更新)
+    # 2段階: 18:00 UTC = 翌03:00 JST → 日本株(前営業日の確定足・東証寄付き前で安全)。
+    #        22:00 UTC = 翌07:00 JST → 米国株(米引け後で確定)。UTC日-木 = JST月-金。
+    - cron: '0 18 * * 0-4'   # 03:00 JST 日本株
+    - cron: '0 22 * * 0-4'   # 07:00 JST 米国株
+  workflow_dispatch:
+    inputs:
+      market:
+        description: 'jp / us / both'
+        default: 'both'
 
 concurrency:
   group: vcp-screen
@@ -26,14 +31,27 @@ jobs:
       - name: Install deps
         run: pip install -r requirements.txt
 
-      # ---- 米国株: トレンドテンプレ+VCP+成長(EDGAR)+自作DV → JSON追記 ----
+      - name: Decide market
+        id: mkt
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            if [ "${{ github.event.schedule }}" = "0 18 * * 0-4" ]; then M=jp; else M=us; fi
+          else
+            M="${{ github.event.inputs.market }}"; [ -z "$M" ] && M=both
+          fi
+          echo "market=$M" >> "$GITHUB_OUTPUT"
+          echo "MARKET=$M"
+
+      # ---- 米国株(7:00 JST / both) ----
       - name: US screen + export
+        if: steps.mkt.outputs.market == 'us' || steps.mkt.outputs.market == 'both'
         run: |
           python minervini_screener.py --universe nyse_nasdaq --rs-min 70 --growth --deepvue --out us_today || echo "US screen degraded"
           python export_vcp_json.py --market US --csv us_today.csv --out vcp_us_history.json || echo "US export failed"
 
-      # ---- 日本株: JPXユニバース+トレンドテンプレ+VCP+自作DV(+任意で成長EDINET) → JSON追記 ----
+      # ---- 日本株(3:00 JST / both) 東証寄付き前なので確定足 ----
       - name: JP screen + export
+        if: steps.mkt.outputs.market == 'jp' || steps.mkt.outputs.market == 'both'
         env:
           EDINETDB_API_KEY: ${{ secrets.EDINETDB_API_KEY }}
         run: |
@@ -42,25 +60,25 @@ jobs:
           if [ -n "${EDINETDB_API_KEY}" ]; then
             python jp_growth.py --csv jp_today.csv --min-rev 15 --min-eps 15 || echo "jp growth failed"
           else
-            echo "EDINETDB_API_KEY 未設定 → 増収増益フィルタはスキップ(トレンド+VCPのみで出力)"
+            echo "EDINETDB_API_KEY 未設定 → 成長フィルタskip"
           fi
           python export_vcp_json.py --market JP --csv jp_today.csv --out vcp_jp_history.json || echo "JP export failed"
 
-      # ---- 履歴を自リポにコミット(次回に半年分を積み上げるため) ----
+      # ---- 履歴を自リポにコミット(半年分の積み上げ) ----
       - name: Persist history
         run: |
           git config user.name "vcp-bot"
           git config user.email "vcp-bot@users.noreply.github.com"
           git add vcp_us_history.json vcp_jp_history.json
-          git commit -m "history $(date -u +%F)" || echo "no history change"
+          git commit -m "history ${{ steps.mkt.outputs.market }} $(date -u +%F)" || echo "no history change"
           git push || echo "history push skipped"
 
-      # ---- 結果JSONだけ公開リポ theme-flow へ送る(=ページが表示。コードは非公開のまま) ----
+      # ---- 結果JSONを公開リポ theme-flow へ(コードは非公開のまま) ----
       - name: Publish JSON to theme-flow
         env:
           TF_TOKEN: ${{ secrets.THEMEFLOW_TOKEN }}
         run: |
-          if [ -z "${TF_TOKEN}" ]; then echo "THEMEFLOW_TOKEN 未設定 → 公開サイトへの反映はスキップ"; exit 0; fi
+          if [ -z "${TF_TOKEN}" ]; then echo "THEMEFLOW_TOKEN 未設定 → 公開反映スキップ"; exit 0; fi
           git clone --depth 1 "https://x-access-token:${TF_TOKEN}@github.com/ikameron009/theme-flow.git" tf
           cp vcp_us_history.json tf/vcp_us.json
           cp vcp_jp_history.json tf/vcp_jp.json
@@ -68,5 +86,5 @@ jobs:
           git config user.name "vcp-bot"
           git config user.email "vcp-bot@users.noreply.github.com"
           git add vcp_us.json vcp_jp.json
-          git commit -m "VCP screener update $(date -u +%F)" || { echo "no change"; exit 0; }
+          git commit -m "VCP screener update (${{ steps.mkt.outputs.market }}) $(date -u +%F)" || { echo "no change"; exit 0; }
           git push
