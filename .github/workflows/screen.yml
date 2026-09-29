@@ -64,27 +64,31 @@ jobs:
           fi
           python export_vcp_json.py --market JP --csv jp_today.csv --out vcp_jp_history.json || echo "JP export failed"
 
-      # ---- 履歴を自リポにコミット(半年分の積み上げ) ----
+      # ---- 履歴を自リポにコミット(自市場のファイルだけ・rebaseで競合回避) ----
       - name: Persist history
         run: |
           git config user.name "vcp-bot"
           git config user.email "vcp-bot@users.noreply.github.com"
-          git add vcp_us_history.json vcp_jp_history.json
-          git commit -m "history ${{ steps.mkt.outputs.market }} $(date -u +%F)" || echo "no history change"
+          M="${{ steps.mkt.outputs.market }}"
+          if [ "$M" = "jp" ] || [ "$M" = "both" ]; then git add vcp_jp_history.json; fi
+          if [ "$M" = "us" ] || [ "$M" = "both" ]; then git add vcp_us_history.json; fi
+          git commit -m "history $M $(date -u +%F)" || { echo "no history change"; exit 0; }
+          git pull --rebase --autostash origin main || true
           git push || echo "history push skipped"
 
-      # ---- 結果JSONを公開リポ theme-flow へ(コードは非公開のまま) ----
+      # ---- 結果JSONを公開リポ theme-flow へ(★自市場のファイルだけ上書き・逆戻り防止) ----
       - name: Publish JSON to theme-flow
         env:
           TF_TOKEN: ${{ secrets.THEMEFLOW_TOKEN }}
         run: |
           if [ -z "${TF_TOKEN}" ]; then echo "THEMEFLOW_TOKEN 未設定 → 公開反映スキップ"; exit 0; fi
-          git clone --depth 1 "https://x-access-token:${TF_TOKEN}@github.com/ikameron009/theme-flow.git" tf
-          cp vcp_us_history.json tf/vcp_us.json
-          cp vcp_jp_history.json tf/vcp_jp.json
+          M="${{ steps.mkt.outputs.market }}"
+          git clone "https://x-access-token:${TF_TOKEN}@github.com/ikameron009/theme-flow.git" tf
+          if [ "$M" = "jp" ] || [ "$M" = "both" ]; then cp vcp_jp_history.json tf/vcp_jp.json; fi
+          if [ "$M" = "us" ] || [ "$M" = "both" ]; then cp vcp_us_history.json tf/vcp_us.json; fi
           cd tf
           git config user.name "vcp-bot"
           git config user.email "vcp-bot@users.noreply.github.com"
           git add vcp_us.json vcp_jp.json
-          git commit -m "VCP screener update (${{ steps.mkt.outputs.market }}) $(date -u +%F)" || { echo "no change"; exit 0; }
-          git push
+          git commit -m "VCP screener update ($M) $(date -u +%F)" || { echo "no change"; exit 0; }
+          git push || (git pull --rebase origin main && git push)
