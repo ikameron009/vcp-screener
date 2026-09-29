@@ -30,10 +30,25 @@ def _num(x):
         return None
 
 
+def _chartmill_us():
+    """ChartMill「Best Minervini-Style US Stocks」Top10を公開APIから取得(米国のみ)。
+    シートのCHART MILL手入力の代わりに母集団へ加える。失敗時は空集合(=従来どおり)。"""
+    try:
+        import update_chartmill
+        return set(update_chartmill.fetch_chartmill(page=1, screen=33, limit=10))
+    except Exception as e:
+        print(f"ChartMill取得スキップ: {e}")
+        return set()
+
+
 def build_session(market, csv_path, prev_codes, prev_streak):
     hdr = S.full_hdr(market)
+    cm = _chartmill_us() if market == "US" else set()
+    if cm:
+        print(f"[US] ChartMill Top10を母集団に追加: {sorted(cm)}")
+    # DeepVueは手入力(シート)のみ→自動化不可のため空。ChartMillは公開APIで補完。
     date, block, codes, urls = S.build_block(
-        market, csv_path, deepvue=None, chartmill=None,
+        market, csv_path, deepvue=None, chartmill=cm,
         prev_codes=prev_codes, prev_streak=prev_streak)
     data_rows = block[2:]                       # [row0(件数), hdr, ...rows]
     idx = {h: i for i, h in enumerate(hdr)}
