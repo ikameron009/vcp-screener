@@ -5,9 +5,9 @@ run-name: ${{ github.event_name == 'workflow_dispatch' && format('VCP screen [{0
 on:
   schedule:
     # 2段階: 18:00 UTC = 翌03:00 JST → 日本株(前営業日の確定足・東証寄付き前で安全)。
-    #        22:00 UTC = 翌07:00 JST → 米国株(米引け後で確定)。UTC日-木 = JST月-金。
-    - cron: '0 18 * * 0-4'   # 03:00 JST 日本株
-    - cron: '0 22 * * 0-4'   # 07:00 JST 米国株
+    #        22:00 UTC = 翌07:00 JST → 米国株(米引け後で確定)。UTC月-金 = JST火-土(金曜の結果は土曜朝)。
+    - cron: '0 18 * * 1-5'   # 03:00 JST 日本株
+    - cron: '0 22 * * 1-5'   # 07:00 JST 米国株
   workflow_dispatch:
     inputs:
       market:
@@ -32,7 +32,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "${{ github.event_name }}" != "schedule" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          if [ "${{ github.event.schedule }}" = "0 18 * * 0-4" ]; then M=jp; else M=us; fi
+          if [ "${{ github.event.schedule }}" = "0 18 * * 1-5" ]; then M=jp; else M=us; fi
           SINCE=$(date -u -d '12 hours ago' +%Y-%m-%dT%H:%M:%SZ)
           N=$(gh run list -R "${{ github.repository }}" --workflow screen.yml --event workflow_dispatch --created ">=$SINCE" --limit 20 --json displayTitle,status,conclusion --jq "[.[] | select((.displayTitle|contains(\"[$M]\")) or (.displayTitle|contains(\"[both]\"))) | select(.conclusion==\"success\" or .status!=\"completed\")] | length") || N=0
           echo "market=$M 済み件数=$N"
@@ -61,7 +61,7 @@ jobs:
         id: mkt
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            if [ "${{ github.event.schedule }}" = "0 18 * * 0-4" ]; then M=jp; else M=us; fi
+            if [ "${{ github.event.schedule }}" = "0 18 * * 1-5" ]; then M=jp; else M=us; fi
           else
             M="${{ github.event.inputs.market }}"; [ -z "$M" ] && M=both
           fi
