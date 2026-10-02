@@ -77,6 +77,18 @@ def build_session(market, csv_path, prev_codes, prev_streak, date=None):
             rec["mcap"] = g(row, "時価総額")      # 例 "$12B"(表示用文字列のまま)
             rec["listing"] = g(row, "上場")       # 例 "5" or "5M"
         rows.append(rec)
+    if market == "JP" and rows:
+        # 日本株にも時価総額(億円)と上場年数を付ける(米国と同じ取得・キャッシュを jp_meta_cache.json で)
+        try:
+            meta = S.load_us_meta([r["code"] + ".T" for r in rows], cache_path=os.path.join(HERE, "jp_meta_cache.json"))
+            for r in rows:
+                m = meta.get(r["code"] + ".T", {})
+                mc = m.get("mktcap")
+                r["mcap"] = f"{round(mc / 1e8):,}億円" if mc else ""
+                ipo = m.get("ipo") or ""
+                r["listing"] = "25年以上" if ipo and ipo < "2002-01-01" else S.fmt_listing(ipo)   # Yahooの日本株データは2000〜2001年から
+        except Exception as e:
+            print("JP meta skipped:", e)
     return {"date": date, "count": len(rows), "rows": rows}, set(codes)
 
 

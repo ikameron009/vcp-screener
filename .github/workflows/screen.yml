@@ -96,8 +96,8 @@ jobs:
           git config user.name "vcp-bot"
           git config user.email "vcp-bot@users.noreply.github.com"
           M="${{ steps.mkt.outputs.market }}"
-          if [ "$M" = "jp" ] || [ "$M" = "both" ]; then git add vcp_jp_history.json; fi
-          if [ "$M" = "us" ] || [ "$M" = "both" ]; then git add vcp_us_history.json; fi
+          if [ "$M" = "jp" ] || [ "$M" = "both" ]; then git add vcp_jp_history.json; [ -f jp_meta_cache.json ] && git add jp_meta_cache.json; fi
+          if [ "$M" = "us" ] || [ "$M" = "both" ]; then git add vcp_us_history.json; [ -f us_meta_cache.json ] && git add us_meta_cache.json; fi
           git commit -m "history $M $(date -u +%F)" || { echo "no history change"; exit 0; }
           for i in 1 2 3; do
             git pull --rebase --autostash origin main && git push && exit 0

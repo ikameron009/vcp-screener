@@ -297,17 +297,18 @@ def load_us_yf(tickers):
     return cache
 
 
-def load_us_meta(tickers):
+def load_us_meta(tickers, cache_path=None):
     """US表示銘柄の時価総額/上場日を取得(キャッシュ)。
     {ticker: {'mktcap': 生ドル, 'ipo': 'YYYY-MM-DD', 'asof': 'YYYY-MM-DD'}}。
     ・ipo は不変なので一度だけ history(period='max') の最古バーで確定し永久キャッシュ。
     ・mktcap は fast_info.market_cap を asof が当日でなければ更新(.infoは不安定なので使わない)。
       取得失敗時は前回値を保持(=当日は据え置き)。"""
     import yfinance as yf
+    cache_path = cache_path or US_META_CACHE
     cache = {}
-    if os.path.exists(US_META_CACHE):
+    if os.path.exists(cache_path):
         try:
-            cache = json.load(open(US_META_CACHE, encoding="utf-8"))
+            cache = json.load(open(cache_path, encoding="utf-8"))
         except Exception:
             cache = {}
     today = us_date()
@@ -340,7 +341,7 @@ def load_us_meta(tickers):
         cache[tk] = rec
         changed = True
     if changed:
-        json.dump(cache, open(US_META_CACHE, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+        json.dump(cache, open(cache_path, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
     return cache
 
 
