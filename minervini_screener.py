@@ -116,15 +116,19 @@ def download_chunk(tickers, period="2y"):
     df = yf.download(tickers, period=period, interval="1d", auto_adjust=True,
                      group_by="ticker", threads=True, progress=False)
     out = {}
+    # 場中の当日分(未確定)を除く: 本来そろっているはずの最新取引日より新しい行は捨てる
+    from market_calendar import expected_session
+    exp = {m: expected_session(m) for m in ("jp", "us")}
+    _cut = lambda tk, sub: sub[sub.index.date <= exp["jp" if tk.endswith(".T") else "us"]]
     if isinstance(df.columns, pd.MultiIndex):
         for tk in tickers:
             if tk in df.columns.get_level_values(0):
-                sub = df[tk].dropna()
+                sub = _cut(tk, df[tk].dropna())
                 if len(sub) >= 200:
                     out[tk] = sub
     else:  # 単一銘柄
         if len(tickers) == 1 and len(df.dropna()) >= 200:
-            out[tickers[0]] = df.dropna()
+            out[tickers[0]] = _cut(tickers[0], df.dropna())
     return out
 
 
