@@ -41,14 +41,14 @@ def _chartmill_us():
         return set()
 
 
-def build_session(market, csv_path, prev_codes, prev_streak):
+def build_session(market, csv_path, prev_codes, prev_streak, date=None):
     hdr = S.full_hdr(market)
     cm = _chartmill_us() if market == "US" else set()
     if cm:
         print(f"[US] ChartMill Top10を母集団に追加: {sorted(cm)}")
     # DeepVueは手入力(シート)のみ→自動化不可のため空。ChartMillは公開APIで補完。
     date, block, codes, urls = S.build_block(
-        market, csv_path, deepvue=None, chartmill=cm,
+        market, csv_path, date=date, deepvue=None, chartmill=cm,
         prev_codes=prev_codes, prev_streak=prev_streak)
     data_rows = block[2:]                       # [row0(件数), hdr, ...rows]
     idx = {h: i for i, h in enumerate(hdr)}
@@ -97,14 +97,29 @@ def main():
             pass
     sessions = hist.get("sessions", [])
 
-    # 直近セッションから prev_codes / prev_streak を取る(新規・継続判定)
+    # この回の日付 = 価格データの最終日(スクリーナーが {csv名}_meta.json に書く)。無ければ従来どおり実行日
+    meta_path = os.path.splitext(a.csv)[0] + "_meta.json"
+    data_date = None
+    if os.path.exists(meta_path):
+        data_date = json.load(open(meta_path, encoding="utf-8")).get("data_date")
+
+    # 前回 = この回と違う日付のうち最新(同じ日付の再実行では1つ前の日と比べる)
     prev_codes, prev_streak = set(), {}
-    if sessions:
-        last = sessions[-1]
+    older = [s for s in sessions if s.get("date") != data_date] if data_date else sessions
+    if older:
+        last = older[-1]
         prev_codes = {r["code"] for r in last["rows"]}
         prev_streak = {r["code"]: (r.get("streak") or 1) for r in last["rows"]}
 
-    session, _codes = build_session(a.market, a.csv, prev_codes, prev_streak)
+    session, _codes = build_session(a.market, a.csv, prev_codes, prev_streak, date=data_date)
+
+    # 取りこぼし判定: 本来そろっているはずの最新取引日より古ければ、ラン失敗用のフラグを書く
+    from market_calendar import expected_session
+    expected = str(expected_session(a.market.lower()))
+    ok = session["date"] >= expected
+    with open(os.path.join(HERE, f"vcp_status_{a.market.lower()}.json"), "w", encoding="utf-8") as f:
+        json.dump({"market": a.market.lower(), "latest": session["date"], "expected": expected, "ok": ok}, f)
+    print(("[ok] " if ok else "[INCOMPLETE] ") + f"データ日 {session['date']} / 期待 {expected}")
 
     # 同一日を置換 → 追記 → 日付昇順 → 直近keepにトリム
     sessions = [s for s in sessions if s.get("date") != session["date"]]

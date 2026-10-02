@@ -24,6 +24,7 @@ ChartMillの「Best Minervini-Style US Stocks」を価格ベースで再現:
   # 出力を検証:
   python vcp_backtester.py --tickers-file minervini_watchlist.txt --exit trailMA --trail-ma 50
 """
+import json
 import argparse
 import sys
 import time
@@ -235,6 +236,8 @@ def main():
     spx_perf = None
 
     results = []
+    from collections import Counter
+    last_dates = Counter()   # 各銘柄の価格データの最終日 → 最頻値をこの回の「データ日」とする
     n = len(uni)
     for i in range(0, n, args.chunk):
         chunk = uni[i:i + args.chunk]
@@ -244,11 +247,23 @@ def main():
             print(f"  chunk {i//args.chunk+1} 取得失敗: {e}")
             continue
         for tk, sub in data.items():
+            try:
+                last_dates[str(pd.Timestamp(sub.index[-1]).date())] += 1
+            except Exception:
+                pass
             r = evaluate(tk, sub, spx_perf)
             if r is not None:
                 results.append(r)
         print(f"  進捗 {min(i+args.chunk, n)}/{n}  (評価済 {len(results)})")
         time.sleep(0.3)  # レート制限緩和
+
+    if last_dates:
+        data_date, n_on = last_dates.most_common(1)[0]
+        meta = {"data_date": data_date, "n_on_date": n_on, "n_total": sum(last_dates.values()),
+                "dates": dict(last_dates.most_common(5))}
+        with open(args.out + "_meta.json", "w", encoding="utf-8") as f:
+            json.dump(meta, f, ensure_ascii=False)
+        print(f"価格データの最終日 = {data_date} ({n_on}/{meta['n_total']}銘柄)  内訳{meta['dates']}")
 
     if not results:
         print("評価できる銘柄がありませんでした。"); return

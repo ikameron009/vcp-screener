@@ -4,9 +4,9 @@ run-name: ${{ github.event_name == 'workflow_dispatch' && format('VCP screen [{0
 
 on:
   schedule:
-    # 2段階: 18:00 UTC = 翌03:00 JST → 日本株(前営業日の確定足・東証寄付き前で安全)。
+    # 2段階: 08:00 UTC = 17:00 JST → 日本株(当日の大引け後。翌3:00だとYahooの前日分が未反映)。
     #        22:00 UTC = 翌07:00 JST → 米国株(米引け後で確定)。UTC月-金 = JST火-土(金曜の結果は土曜朝)。
-    - cron: '0 18 * * 1-5'   # 03:00 JST 日本株
+    - cron: '0 8 * * 1-5'   # 17:00 JST 日本株(当日の大引け後)
     - cron: '0 22 * * 1-5'   # 07:00 JST 米国株
   workflow_dispatch:
     inputs:
@@ -32,7 +32,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "${{ github.event_name }}" != "schedule" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          if [ "${{ github.event.schedule }}" = "0 18 * * 1-5" ]; then M=jp; else M=us; fi
+          if [ "${{ github.event.schedule }}" = "0 8 * * 1-5" ]; then M=jp; else M=us; fi
           SINCE=$(date -u -d '12 hours ago' +%Y-%m-%dT%H:%M:%SZ)
           N=$(gh run list -R "${{ github.repository }}" --workflow screen.yml --event workflow_dispatch --created ">=$SINCE" --limit 20 --json displayTitle,status,conclusion --jq "[.[] | select((.displayTitle|contains(\"[$M]\")) or (.displayTitle|contains(\"[both]\"))) | select(.conclusion==\"success\" or .status!=\"completed\")] | length") || N=0
           echo "market=$M 済み件数=$N"
@@ -61,7 +61,7 @@ jobs:
         id: mkt
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            if [ "${{ github.event.schedule }}" = "0 18 * * 1-5" ]; then M=jp; else M=us; fi
+            if [ "${{ github.event.schedule }}" = "0 8 * * 1-5" ]; then M=jp; else M=us; fi
           else
             M="${{ github.event.inputs.market }}"; [ -z "$M" ] && M=both
           fi
@@ -75,7 +75,7 @@ jobs:
           python minervini_screener.py --universe nyse_nasdaq --rs-min 70 --growth --deepvue --out us_today || echo "US screen degraded"
           python export_vcp_json.py --market US --csv us_today.csv --out vcp_us_history.json || echo "US export failed"
 
-      # ---- 日本株(3:00 JST / both) 東証寄付き前なので確定足 ----
+      # ---- 日本株(17:00 JST / both) 当日の大引け後 ----
       - name: JP screen + export
         if: steps.mkt.outputs.market == 'jp' || steps.mkt.outputs.market == 'both'
         env:
@@ -126,3 +126,9 @@ jobs:
       - name: Fail if history was not saved
         if: env.HISTORY_FAIL == '1'
         run: exit 1
+
+      # 価格データが本来の最新取引日より古い(Yahooの反映待ち等)回は失敗扱い → Workerの見張りが再実行・通知
+      - name: Fail if price data is stale
+        if: always()
+        run: |
+          python -c "import json,glob,sys; bad=[s for s in (json.load(open(f)) for f in glob.glob('vcp_status_*.json')) if not s.get('ok')]; [print('::error::データの取りこぼし', b) for b in bad]; sys.exit(1 if bad else 0)"
