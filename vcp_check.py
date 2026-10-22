@@ -245,6 +245,14 @@ FBW_TIGHT = 0.40   # レンジのタイトさ(浅いほど高)
 FBW_VOL   = 0.40   # ブレイク出来高の強さ(50日平均比)
 FBW_RUN   = 0.20   # 事前上昇の勢い
 
+# 市場別のFB設定(既定値からの差分)。日本株=既定(深さ15%・出来高1.5倍)。
+# 米国株=2026-10-22バックテスト(2組×406銘柄)で両組とも現行より良かった 深さ12%×出来高2.0倍
+#   (PF 1.29→1.38・平均負 −10.3→−9.0%)。詳細=FB_US_backtest_2026-10-22.md
+FB_PARAMS_BY_MARKET = {
+    "JP": {},
+    "US": {"max_depth": 12.0, "fb_vol_mult": 2.0},
+}
+
 
 def fb_box_scan(h, l, c, t, lookbacks=FB_LB_SCAN, max_depth=FB_MAX_DEPTH):
     """バー t で「深さ<=max_depth かつ 当日終値がレンジ上限を初めて上抜け」となる窓のうち
@@ -351,7 +359,7 @@ def vcp_eval_codes(codes, market, chunk=120):
             try:
                 ev = vcp_eval_today(df)
                 bk = fpbreak_today(df)               # TradingView BUY(fpBreak)を最新足で再現
-                fb = flatbase_break_today(df)        # フラットベース/レンジブレイク(VCP非依存)
+                fb = flatbase_break_today(df, **FB_PARAMS_BY_MARKET.get(market, {}))   # フラットベース/レンジブレイク(VCP非依存・市場別設定)
                 vcp_buy = bool(bk["buy"])
                 fb_buy = bool(fb["buy"])
                 ev["buy"] = vcp_buy or fb_buy
