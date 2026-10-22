@@ -224,9 +224,117 @@ def fpbreak_today(df, swing_len=5, min_legs=2, max_last_dep=12.0, stale_bars=30,
     return res
 
 
+# ============================================================================
+#  フラットベース / レンジ(ボックス)ブレイク検出 — VCPとは独立した第2のBuy源
+# ============================================================================
+# ミネルヴィニの「フラットベース」「ボックス(ダーバス)ブレイク」を近似。
+# VCP(段階的収縮)を作らずに、一定レンジを持ち合ってから出来高を伴って
+# レンジ上限を上抜ける型(例: 4417)を拾う。トレンドテンプレは共通ゲート。
+# ベース窓は固定長ではなく複数長をスキャンし、深さ条件を満たす"最長"窓を採用する。
+# 急騰株(例:4417)は40日窓だと上昇全体を拾って深さ30%+になるが、直近10-12日では
+# タイトな棚(10-15%)を形成している。短窓~長窓を走査して本当の持ち合いを捉える。
+FB_LB_SCAN     = (10, 12, 15, 20, 25, 30, 35, 40)  # ベース窓の候補(営業日)
+FB_MIN_LEN     = 10     # 最低持ち合い日数(スキャン下限)
+FB_MAX_DEPTH   = 15.0   # レンジの深さ上限%((top-low)/top)。2026-10掃引で25→15が最適(PF↑・平均損失↓)
+FB_MIN_PRIOR   = 25.0   # ベース手前の上昇%(ステージ2内のベース=先行する上昇が必要)
+FB_PRIOR_WIN   = 60     # 事前上昇を測る窓(ベース開始の手前・営業日)
+FB_MAX_STOP    = 0.0    # 初期リスク上限%: stop=max(box_low, entry×(1-これ/100))。0=無効(box_low素)。
+                        #   掃引の結果、ストップ短縮は揺り戻しで刈られPF悪化→box_low据え置きが最良
+# FBスコア(0-100)の重み。合計=1.0。
+FBW_TIGHT = 0.40   # レンジのタイトさ(浅いほど高)
+FBW_VOL   = 0.40   # ブレイク出来高の強さ(50日平均比)
+FBW_RUN   = 0.20   # 事前上昇の勢い
+
+
+def fb_box_scan(h, l, c, t, lookbacks=FB_LB_SCAN, max_depth=FB_MAX_DEPTH):
+    """バー t で「深さ<=max_depth かつ 当日終値がレンジ上限を初めて上抜け」となる窓のうち
+    最長のものを (base_len, box_top, box_low, depth) で返す。無ければ None。
+    box_top/low は当日(t)を含まない [t-lb, t-1] の高値/安値。crossover は前足<=top<当日終値。"""
+    best = None
+    for lb in lookbacks:
+        if t - lb < 0:
+            continue
+        bt = float(h[t - lb:t].max())
+        bl = float(l[t - lb:t].min())
+        if not (bt > 0) or bt <= bl:
+            continue
+        depth = (bt - bl) / bt * 100.0
+        if depth > max_depth:
+            continue
+        if not (c[t - 1] <= bt and c[t] > bt):       # その窓の上限を初めて上抜けたバーか
+            continue
+        best = (lb, bt, bl, depth)                   # 昇順走査=最後に残るのが最長の合格窓
+    return best
+
+
+def flatbase_break_today(df, fb_vol_mult=1.5, lookbacks=FB_LB_SCAN,
+                         max_depth=FB_MAX_DEPTH, min_prior=FB_MIN_PRIOR, prior_win=FB_PRIOR_WIN,
+                         max_stop_pct=FB_MAX_STOP):
+    """最新足が「フラットベース/レンジ(ボックス)ブレイク」かを判定。
+    {'buy': bool, 'score': int|None, 'dist': float|None, 'pivot', 'stop',
+     'box_top', 'box_low', 'depth', 'runup', 'base_len'} を返す。
+    条件:
+      G1 トレンドテンプレ(ステージ2) … VCPと同一式
+      G2 ベース存在: 窓候補を走査し、深さ<=max_depth かつ上限ブレイクの"最長"窓を採用。
+                      かつ ベース手前prior_win本からの上昇>=min_prior
+      G3 ブレイク: 当日終値がレンジ上限を初めて上抜け + 出来高>50日平均×fb_vol_mult
+    買い点=box_top、ストップ=box_low。"""
+    empty = {"buy": False, "score": None, "dist": None, "pivot": math.nan, "stop": math.nan,
+             "box_top": math.nan, "box_low": math.nan, "depth": math.nan, "runup": math.nan,
+             "base_len": None}
+    if df is None or len(df) < 260:
+        return empty
+    d = B.precompute(df)
+    n = len(d["c"]); h, l, c, v = d["h"], d["l"], d["c"], d["v"]
+    sma50, sma150, sma200, low252, vol50 = d["sma50"], d["sma150"], d["sma200"], d["low252"], d["vol50"]
+    t = n - 1
+    if (any(math.isnan(x) for x in (sma50[t], sma150[t], sma200[t], low252[t]))
+            or t - 20 < 0 or math.isnan(sma200[t - 20])):
+        return empty
+    # --- G1 トレンドテンプレ(VCPと同一) ---
+    up = (c[t] > sma50[t] and sma50[t] > sma150[t] and sma150[t] > sma200[t]
+          and sma200[t] > sma200[t - 20] and c[t] > low252[t] * 1.3)
+    if not up:
+        return empty
+    # --- G2 ベース: 深さ条件+上限ブレイクを満たす最長窓 ---
+    box = fb_box_scan(h, l, c, t, lookbacks, max_depth)
+    if box is None:
+        return empty
+    base_len, box_top, box_low, depth = box
+    # 事前上昇(ベース開始の手前prior_win本の安値→ベース上限): ステージ2内のベースか
+    ps = t - base_len - prior_win
+    if ps < 0:
+        return empty
+    prior_low = float(l[ps:t - base_len].min())
+    runup = (box_top - prior_low) / prior_low * 100.0 if prior_low > 0 else 0.0
+    if runup < min_prior:
+        return {**empty, "box_top": box_top, "box_low": box_low, "depth": round(depth, 1),
+                "runup": round(runup, 1), "base_len": base_len}
+    # --- G3 出来高(ブレイク上抜けは fb_box_scan 済み) ---
+    vol_ok = (not math.isnan(vol50[t])) and vol50[t] > 0 and v[t] > vol50[t] * fb_vol_mult
+    if not (vol_ok and c[t] > box_low):
+        return {**empty, "box_top": box_top, "box_low": box_low, "depth": round(depth, 1),
+                "runup": round(runup, 1), "base_len": base_len}
+    # --- スコア(0-100): タイトさ × 出来高 × 事前上昇 ---
+    tight = _clamp(1.0 - depth / max_depth, 0.0, 1.0)
+    volr = v[t] / vol50[t]
+    volstr = _clamp((volr - 1.0) / (3.0 - 1.0), 0.0, 1.0)     # 1.0x→0, 3.0x→1.0
+    runstr = _clamp(runup / 100.0, 0.0, 1.0)
+    score = int(round(100.0 * (FBW_TIGHT * tight + FBW_VOL * volstr + FBW_RUN * runstr)))
+    dist = round((box_top - c[t]) / c[t] * 100.0, 1) if c[t] else None
+    # 初期リスク上限: box_lowが遠い(深いベース)ときはストップを引き上げて1回の損失を限定
+    stop = box_low
+    if max_stop_pct and max_stop_pct > 0:
+        stop = max(box_low, c[t] * (1.0 - max_stop_pct / 100.0))
+    return {"buy": True, "score": score, "dist": dist, "pivot": box_top, "stop": stop,
+            "box_top": box_top, "box_low": box_low, "depth": round(depth, 1),
+            "runup": round(runup, 1), "base_len": base_len}
+
+
 def vcp_eval_codes(codes, market, chunk=120):
-    """codes(米=ティッカー/日=4桁) のうち今日VCP有効なものを
-    {code: {'score': int, 'dist': float|None, 'pivot': float, 'stop': float}} で返す。
+    """codes(米=ティッカー/日=4桁) のうち今日VCP有効 または Buy発火(VCP/FB) のものを
+    {code: {'valid','score','dist','pivot','stop','buy','buy_type'}} で返す。
+    buy_type: 'VCP'(fpBreak) / 'FB'(フラットベース/レンジブレイク) / '' 。
     価格は yfinance で一括取得。"""
     ymap = {}
     for cc in codes:
@@ -243,8 +351,19 @@ def vcp_eval_codes(codes, market, chunk=120):
             try:
                 ev = vcp_eval_today(df)
                 bk = fpbreak_today(df)               # TradingView BUY(fpBreak)を最新足で再現
-                ev["buy"] = bool(bk["buy"])
-                if ev["valid"] or ev["buy"]:         # VCP有効 または Buy発火 の銘柄を返す
+                fb = flatbase_break_today(df)        # フラットベース/レンジブレイク(VCP非依存)
+                vcp_buy = bool(bk["buy"])
+                fb_buy = bool(fb["buy"])
+                ev["buy"] = vcp_buy or fb_buy
+                ev["buy_type"] = "VCP" if vcp_buy else ("FB" if fb_buy else "")
+                # FBのみ発火(VCP形状は無効)なら、距離/買い点/ストップをFBの値で補完。
+                # VCPスコア(ev["score"])は埋めない=VCP列は空欄のまま(VCPとFBを混同しない)。
+                if fb_buy and not vcp_buy:
+                    ev["dist"] = fb["dist"]
+                    ev["pivot"] = fb["pivot"]
+                    ev["stop"] = fb["stop"]
+                    ev["fb_score"] = fb["score"]     # FBの質(0-100)。表示/優先度の将来拡張用
+                if ev["valid"] or ev["buy"]:         # VCP有効 または Buy発火(VCP/FB) の銘柄を返す
                     out[ymap[yt]] = ev
             except Exception:
                 pass

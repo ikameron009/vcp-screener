@@ -400,6 +400,9 @@ def fetch_deepvue(sh):
 
 
 # ==================== 市場ごとのブロック構築 ====================
+LAST_BUY_TYPE = {}   # 直近のbuild_blockで BUY した銘柄の種類 {code: "VCP"|"FB"}
+
+
 def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_codes=None, prev_streak=None):
     """(date, block_values, all_codes_set, code_urls) を返す。date未指定なら実行日(NY)。
     deepvue/chartmill: DEEPVUEタブの各集合(US専用)。CMはCM列に✓＋unionに追加。
@@ -527,7 +530,10 @@ def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_
         print(f"[{market}] VCP判定スキップ: {e}")
         vcp_eval = {}
     vcp_set = {c for c, ev in vcp_eval.items() if ev.get("valid")}   # VCP有効のみ(buyのみは除外)
-    buy_set = {c for c, ev in vcp_eval.items() if ev.get("buy")}     # TradingView BUY(fpBreak)発火
+    buy_set = {c for c, ev in vcp_eval.items() if ev.get("buy")}     # BUY発火(VCP=fpBreak / FB=レンジブレイク)
+    # Buyの種類(VCP/FB)をダッシュボード用JSON(export_vcp_json)へ渡す。シートの列は増やさない
+    LAST_BUY_TYPE.clear()
+    LAST_BUY_TYPE.update({c: ev.get("buy_type", "VCP") for c, ev in vcp_eval.items() if ev.get("buy")})
 
     # --- 全銘柄を1リストに統合し、セクター固定順→(米=英字/日=コード)順で並べる ---
     # US該当リストのみ「時価総額/上場」を追加。全市場で末尾に「優先度」列。
@@ -547,7 +553,10 @@ def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_
         ev = vcp_eval.get(code)
         rs = rs_num(code)
         src = sum((code in deepvue, code in chartmill, code in jisaku, code in onimine))
-        gated = ev and ev.get("dist") is not None and ev["dist"] <= PRI_MAX_DIST
+        # gated(1000+score)はVCPスコアがある銘柄のみ。FBのみBuy(score=None・dist有り)は
+        # gatedに入れず、Buy最上位(2000+RS)として扱う(VCPとFBのスコアを混同しない)。
+        gated = (ev and ev.get("dist") is not None and ev.get("score") is not None
+                 and ev["dist"] <= PRI_MAX_DIST)
         if gated:
             d = abs(ev["dist"])
             prox = max(0.0, min(1.0, (PRI_PROX_ZERO - d) / (PRI_PROX_ZERO - PRI_PROX_FULL))) * 100.0
