@@ -68,6 +68,7 @@ def build_session(market, csv_path, prev_codes, prev_streak, date=None):
             "dist": _num(g(row, "ピボット")),
             "buy": g(row, "Buy") == "BUY",
             "buy_type": S.LAST_BUY_TYPE.get(code, "VCP") if g(row, "Buy") == "BUY" else "",
+            "order": S.LAST_ORDER.get(code),     # 翌営業日の逆指値注文 {ok, trig, lim, stop, risk, why} / なければ None
             "prio": _num(g(row, "優先度")),
             "streak": _num(g(row, "継続")) or 1,
             "selfdv": g(row, "自作DV") == CHECK,

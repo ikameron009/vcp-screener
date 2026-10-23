@@ -216,12 +216,66 @@ def fpbreak_today(df, swing_len=5, min_legs=2, max_last_dep=12.0, stale_bars=30,
 
         if t == n - 1:
             res["buy"] = bool(fp_break); res["pivot"] = vcp_pivot; res["stop"] = vcp_stop
+            # 翌営業日の逆指値注文用: 今日の引け時点の固定ピボット状態(リセット後)と、明日のブレイクで使うドライアップ判定
+            dry_next = (not use_dryup) or (not math.isnan(sma_vol_dw[t]) and not math.isnan(vol50[t])
+                                           and vol50[t] > 0 and sma_vol_dw[t] <= vol50[t] * dry_ratio)
+            res["next"] = {"armed": bool(fp_armed), "pivot": fp_pivot, "stop": fp_stop, "close": c[t], "dry_ok": bool(dry_next)}
 
         # 次バーへ持ち越し(Pineのシリーズ[1]参照用)
         fp_contract_prev = fp_contract
         vcp_pivot_prev = vcp_pivot; vcp_stop_prev = vcp_stop
         fp_pivot_endprev = fp_pivot; close_prev = c[t]
     return res
+
+
+# ============================================================================
+#  翌営業日の注文条件(ピボットの逆指値で買う / 損切りは最後の締まりの安値 / 10%超は見送り)
+# ============================================================================
+# 検証: 03_手法分析/27_trade_rules/t8_buystop.py の (c)。
+#   買い: 前日の引けで VCP のピボット待ち・引けがピボット以下・出来高ドライアップ → 当日ピボット+0.1%に届いたら買う。
+#         寄りでピボット+3%超なら見送り(=指値の上限)。出来高1.5倍は引けまで分からないので使わない。
+#   損切り: 最後の締まりの安値。(ピボット−安値)÷ピボット > 10% の形は買わない。
+ORDER_TRIG = 0.001      # 買いの逆指値 = ピボット×(1+これ)
+ORDER_LIMIT = 0.03      # 指値の上限 = ピボット×(1+これ)
+ORDER_MAX_RISK = 0.10   # (ピボット−損切り)÷ピボット がこれを超えたら見送り
+
+
+def _jp_tick(px):
+    """東証の呼値(TOPIX500以外の標準表)。TOPIX500採用銘柄はさらに細かいが、粗い方に合わせても注文は通る。"""
+    for lim, tk in ((3000, 1), (5000, 5), (30000, 10), (50000, 50), (300000, 100), (500000, 500),
+                    (3000000, 1000), (5000000, 5000), (30000000, 10000)):
+        if px <= lim:
+            return tk
+    return 50000
+
+
+def make_order(nxt, market):
+    """fpbreak_today()['next'] から翌営業日の注文条件を作る。対象外(ピボット待ちでない)なら None。
+    返り値: {'ok': bool, 'trig': 買い逆指値, 'lim': 指値の上限, 'stop': 損切り, 'risk': (ピボット−損切り)÷ピボット %, 'why': 見送り理由}"""
+    if not nxt or not nxt.get("armed"):
+        return None
+    piv, stop, close = nxt["pivot"], nxt["stop"], nxt["close"]
+    if any(x is None or math.isnan(x) for x in (piv, stop, close)) or piv <= 0:
+        return None
+    if close > piv or close <= stop:    # 上抜けて引けた(ブレイク済みは追わない) / 損切りを割った
+        return None
+    if market == "JP":
+        tk = _jp_tick(piv)
+        trig = max(math.ceil(piv * (1 + ORDER_TRIG) / tk) * tk, math.floor(piv / tk) * tk + tk)
+        lim = math.floor(piv * (1 + ORDER_LIMIT) / tk) * tk
+        stp = math.floor(stop / tk) * tk
+        trig, lim, stp = (int(x) if float(x).is_integer() else round(x, 1) for x in (trig, lim, stp))
+    else:
+        trig = math.ceil(piv * (1 + ORDER_TRIG) * 100 - 1e-9) / 100
+        lim = math.floor(piv * (1 + ORDER_LIMIT) * 100 + 1e-9) / 100
+        stp = math.floor(stop * 100 + 1e-9) / 100
+    risk = (piv - stop) / piv
+    why = ""
+    if risk > ORDER_MAX_RISK:
+        why = "損切りまで10%超"
+    elif not nxt.get("dry_ok"):
+        why = "直前の出来高が多い"
+    return {"ok": why == "", "trig": trig, "lim": lim, "stop": stp, "risk": round(risk * 100, 2), "why": why}
 
 
 # ============================================================================
@@ -341,8 +395,9 @@ def flatbase_break_today(df, fb_vol_mult=1.5, lookbacks=FB_LB_SCAN,
 
 def vcp_eval_codes(codes, market, chunk=120):
     """codes(米=ティッカー/日=4桁) のうち今日VCP有効 または Buy発火(VCP/FB) のものを
-    {code: {'valid','score','dist','pivot','stop','buy','buy_type'}} で返す。
+    {code: {'valid','score','dist','pivot','stop','buy','buy_type','order'}} で返す。
     buy_type: 'VCP'(fpBreak) / 'FB'(フラットベース/レンジブレイク) / '' 。
+    order: 翌営業日の逆指値注文(make_order。値段は配当調整前の実際の株価) / なければ None。
     価格は yfinance で一括取得。"""
     ymap = {}
     for cc in codes:
@@ -350,6 +405,7 @@ def vcp_eval_codes(codes, market, chunk=120):
         ymap[yt] = cc
     yts = list(ymap.keys())
     out = {}
+    pending = {}   # 翌営業日の注文がある銘柄 {yt: (配当調整済みの日足, fpbreak_today()['next'])}
     for i in range(0, len(yts), chunk):
         try:
             data = M.download_chunk(yts[i:i + chunk])
@@ -371,11 +427,64 @@ def vcp_eval_codes(codes, market, chunk=120):
                     ev["pivot"] = fb["pivot"]
                     ev["stop"] = fb["stop"]
                     ev["fb_score"] = fb["score"]     # FBの質(0-100)。表示/優先度の将来拡張用
-                if ev["valid"] or ev["buy"]:         # VCP有効 または Buy発火(VCP/FB) の銘柄を返す
+                ev["order"] = make_order(bk.get("next"), market)   # 翌営業日の逆指値注文(ピボット待ちのVCPだけ)
+                if ev["order"]:
+                    pending[yt] = (df, bk["next"])
+                if ev["valid"] or ev["buy"] or ev["order"]:   # VCP有効 / Buy発火(VCP/FB) / 明日の注文あり の銘柄を返す
                     out[ymap[yt]] = ev
             except Exception:
                 pass
+    # 注文の値段は実際の株価で出す。判定に使う価格は配当調整済み(auto_adjust)なので、配当落ちより前にできた
+    # ピボット・安値は実際より低い。注文がある銘柄だけ調整前の株価を取り、同じ日の高値/安値に置き換える。
+    if pending:
+        raw = _download_raw(list(pending))
+        for yt, (df, nxt) in pending.items():
+            r = raw.get(yt)
+            if r is None:
+                continue
+            act = dict(nxt)
+            act["pivot"] = _same_bar(df, r, nxt["pivot"], "High")
+            act["stop"] = _same_bar(df, r, nxt["stop"], "Low")
+            act["close"] = float(r["Close"].iloc[-1]) if r.index[-1] == df.index[-1] else nxt["close"]
+            out[ymap[yt]]["order"] = make_order(act, market)
     return out
+
+
+def _download_raw(yts, chunk=120):
+    """配当で調整しない(株式分割だけ調整済みの)日足。{yt: DataFrame}。失敗した銘柄は入らない。"""
+    import yfinance as yf
+    out = {}
+    for i in range(0, len(yts), chunk):
+        part = yts[i:i + chunk]
+        try:
+            df = yf.download(part, period="1y", interval="1d", auto_adjust=False, group_by="ticker",
+                             threads=True, progress=False)
+        except Exception:
+            continue
+        for yt in part:
+            try:
+                sub = df[yt] if len(part) > 1 else df
+                sub = sub.dropna(subset=["Close"])
+                if len(sub):
+                    out[yt] = sub
+            except Exception:
+                pass
+    return out
+
+
+def _same_bar(adj, raw, value, col):
+    """配当調整済みの足で value(高値/安値)をつけた最後の日を探し、その日の調整前の値を返す。見つからなければ
+    最新の調整比(調整前終値÷調整済み終値)で換算。"""
+    a = adj[col].astype(float)
+    hit = a[(a - value).abs() <= max(1e-6, abs(value) * 1e-7)]
+    for d in reversed(hit.index):
+        if d in raw.index:
+            return float(raw.loc[d, col])
+    common = adj.index.intersection(raw.index)
+    if len(common):
+        d = common[-1]
+        return value * float(raw.loc[d, "Close"]) / float(adj.loc[d, "Close"])
+    return value
 
 
 def vcp_valid_codes(codes, market, chunk=120):

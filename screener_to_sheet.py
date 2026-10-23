@@ -401,6 +401,7 @@ def fetch_deepvue(sh):
 
 # ==================== 市場ごとのブロック構築 ====================
 LAST_BUY_TYPE = {}   # 直近のbuild_blockで BUY した銘柄の種類 {code: "VCP"|"FB"}
+LAST_ORDER = {}      # 直近のbuild_blockで 翌営業日の注文条件がある銘柄 {code: vcp_check.make_order(...)}
 
 
 def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_codes=None, prev_streak=None):
@@ -534,6 +535,9 @@ def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_
     # Buyの種類(VCP/FB)をダッシュボード用JSON(export_vcp_json)へ渡す。シートの列は増やさない
     LAST_BUY_TYPE.clear()
     LAST_BUY_TYPE.update({c: ev.get("buy_type", "VCP") for c, ev in vcp_eval.items() if ev.get("buy")})
+    # 翌営業日の注文条件(逆指値の買い・損切り・見送り)も同様にJSONへ渡す。シートの列は増やさない
+    LAST_ORDER.clear()
+    LAST_ORDER.update({c: ev["order"] for c, ev in vcp_eval.items() if ev.get("order")})
 
     # --- 全銘柄を1リストに統合し、セクター固定順→(米=英字/日=コード)順で並べる ---
     # US該当リストのみ「時価総額/上場」を追加。全市場で末尾に「優先度」列。
