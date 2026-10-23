@@ -401,11 +401,27 @@ def fetch_deepvue(sh):
 
 # ==================== 市場ごとのブロック構築 ====================
 LAST_BUY_TYPE = {}   # 直近のbuild_blockで BUY した銘柄の種類 {code: "VCP"|"FB"}
-LAST_ORDER = {}      # 直近のbuild_blockで 翌営業日の注文条件がある銘柄 {code: vcp_check.make_order(...)}
+LAST_ORDER = {}      # 直近のbuild_block(variant="vcp2")で 翌営業日の注文条件がある銘柄 {code: vcp_check.make_order(...)}
+_EVAL_CACHE = {}     # VCP/VCP2を同じ実行で続けて作るとき価格の取り直しを省く {(market, 母集団): vcp_eval_codes(orders=True)}
 
 
-def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_codes=None, prev_streak=None):
+def _vcp_eval(union, market, variant):
+    """variant="vcp": 従来のVCP(注文なし・VCP有効/Buyの銘柄だけ)。 "vcp2": 翌営業日の注文条件つき(注文がある銘柄も入る)。
+    価格は1回だけ取得し(orders=True)、VCPはそこから注文の分を除いて作る=従来と同じ結果。"""
+    import vcp_check
+    key = (market, frozenset(union))
+    if key not in _EVAL_CACHE:
+        _EVAL_CACHE.clear()
+        _EVAL_CACHE[key] = vcp_check.vcp_eval_codes(union, market, orders=True)
+    full = _EVAL_CACHE[key]
+    if variant == "vcp2":
+        return full
+    return {c: {k: v for k, v in ev.items() if k != "order"} for c, ev in full.items() if ev.get("valid") or ev.get("buy")}
+
+
+def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_codes=None, prev_streak=None, variant="vcp"):
     """(date, block_values, all_codes_set, code_urls) を返す。date未指定なら実行日(NY)。
+    variant: "vcp"=従来のVCP / "vcp2"=翌営業日の注文条件つき(ダッシュボードのVCP2)。
     deepvue/chartmill: DEEPVUEタブの各集合(US専用)。CMはCM列に✓＋unionに追加。
       ⚠️deepvue(実DeepVue)は2026-08にDV列を廃止したので列表示しない(unionには残置=空集合想定・優先度は据え置き)。
     ただしETF/REITは他ソースと同様に除外(REITはユーザー投資対象外)。
@@ -524,9 +540,8 @@ def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_
 
     # --- VCP有効判定 + スコア/ピボット距離(価格をyfinanceで取得して真のVCPカウンターで判定) ---
     try:
-        import vcp_check
-        print(f"[{market}] VCP判定中... ({len(union)}銘柄)")
-        vcp_eval = vcp_check.vcp_eval_codes(union, market)   # {code: {valid, score, dist, pivot, stop, buy}}
+        print(f"[{market}] VCP判定中... ({len(union)}銘柄・{variant})")
+        vcp_eval = _vcp_eval(union, market, variant)   # {code: {valid, score, dist, pivot, stop, buy(, order)}}
     except Exception as e:
         print(f"[{market}] VCP判定スキップ: {e}")
         vcp_eval = {}

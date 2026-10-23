@@ -393,11 +393,12 @@ def flatbase_break_today(df, fb_vol_mult=1.5, lookbacks=FB_LB_SCAN,
             "runup": round(runup, 1), "base_len": base_len}
 
 
-def vcp_eval_codes(codes, market, chunk=120):
+def vcp_eval_codes(codes, market, chunk=120, orders=False):
     """codes(米=ティッカー/日=4桁) のうち今日VCP有効 または Buy発火(VCP/FB) のものを
-    {code: {'valid','score','dist','pivot','stop','buy','buy_type','order'}} で返す。
+    {code: {'valid','score','dist','pivot','stop','buy','buy_type'}} で返す。
     buy_type: 'VCP'(fpBreak) / 'FB'(フラットベース/レンジブレイク) / '' 。
-    order: 翌営業日の逆指値注文(make_order。値段は配当調整前の実際の株価) / なければ None。
+    orders=True(VCP2): 'order'=翌営業日の逆指値注文(make_order。値段は配当調整前の実際の株価)/なければ None を付け、
+      明日の注文がある銘柄も返す。orders=False(VCP)は従来どおり。
     価格は yfinance で一括取得。"""
     ymap = {}
     for cc in codes:
@@ -427,10 +428,11 @@ def vcp_eval_codes(codes, market, chunk=120):
                     ev["pivot"] = fb["pivot"]
                     ev["stop"] = fb["stop"]
                     ev["fb_score"] = fb["score"]     # FBの質(0-100)。表示/優先度の将来拡張用
-                ev["order"] = make_order(bk.get("next"), market)   # 翌営業日の逆指値注文(ピボット待ちのVCPだけ)
-                if ev["order"]:
-                    pending[yt] = (df, bk["next"])
-                if ev["valid"] or ev["buy"] or ev["order"]:   # VCP有効 / Buy発火(VCP/FB) / 明日の注文あり の銘柄を返す
+                if orders:
+                    ev["order"] = make_order(bk.get("next"), market)   # 翌営業日の逆指値注文(ピボット待ちのVCPだけ)
+                    if ev["order"]:
+                        pending[yt] = (df, bk["next"])
+                if ev["valid"] or ev["buy"] or ev.get("order"):   # VCP有効 / Buy発火(VCP/FB) / (VCP2のみ)明日の注文あり の銘柄を返す
                     out[ymap[yt]] = ev
             except Exception:
                 pass
