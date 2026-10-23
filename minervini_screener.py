@@ -193,6 +193,9 @@ def evaluate(tk, sub, spx_perf):
     return {
         "ticker": tk, "price": price, "avgvol": avgvol,
         "trend_ok": bool(tt),
+        # 市場の広がり(VCP2の米国株の買い控えに使う): 終値が252日の最高値以上=新高値 / 最安値以下=新安値
+        "nh": bool(price >= hi52), "nl": bool(price <= lo52),
+        "r126": perf(126) - 1.0,                                 # 126日上昇率(テーマの勢いの計算に使う)
         "pct_from_high": (price / hi52 - 1) * 100,
         "pct_above_low": (price / lo52 - 1) * 100,
         "rs_raw": rs_raw,
@@ -265,6 +268,12 @@ def main():
         data_date, n_on = last_dates.most_common(1)[0]
         meta = {"data_date": data_date, "n_on_date": n_on, "n_total": sum(last_dates.values()),
                 "dates": dict(last_dates.most_common(5))}
+        # 新高値−新安値(検証 31_more_conditions/m1_market.py の nhnl と同じ定義。株価 米5ドル/日200円以上・252日分ある銘柄)
+        br = [r for r in results if r["price"] >= (200.0 if r["ticker"].endswith(".T") else 5.0)]
+        if br:
+            nh, nl = sum(r["nh"] for r in br), sum(r["nl"] for r in br)
+            meta.update({"nh": nh, "nl": nl, "n_breadth": len(br), "nhnl": round((nh - nl) / len(br), 4)})
+            print(f"新高値 {nh} / 新安値 {nl} / {len(br)}銘柄 → 新高値−新安値 {meta['nhnl']:+.2%}")
         with open(args.out + "_meta.json", "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False)
         print(f"価格データの最終日 = {data_date} ({n_on}/{meta['n_total']}銘柄)  内訳{meta['dates']}")
@@ -286,7 +295,7 @@ def main():
 
     # 全評価銘柄のRS表を出力(書き込み側でRS源を自作RSに一本化するため)
     try:
-        dfres[["ticker", "RS"]].to_csv(args.out + "_rsall.csv", index=False, encoding="utf-8-sig")
+        dfres[["ticker", "RS", "r126"]].to_csv(args.out + "_rsall.csv", index=False, encoding="utf-8-sig")
     except Exception:
         pass
 

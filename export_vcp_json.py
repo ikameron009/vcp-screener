@@ -78,6 +78,8 @@ def build_session(market, csv_path, prev_codes, prev_streak, date=None, variant=
         }
         if variant == "vcp2":
             rec["order"] = S.LAST_ORDER.get(code)   # 翌営業日の逆指値注文 {ok, trig, lim, stop, risk, why} / なければ None
+            if code in S.LAST_PTS:                  # 注文の優先点と内訳(vcp2_rank)
+                rec["pts"], rec["pts_why"] = S.LAST_PTS[code][0], S.LAST_PTS[code][1]
         if market == "US":
             rec["mcap"] = g(row, "時価総額")      # 例 "$12B"(表示用文字列のまま)
             rec["listing"] = g(row, "上場")       # 例 "5" or "5M"
@@ -94,7 +96,10 @@ def build_session(market, csv_path, prev_codes, prev_streak, date=None, variant=
                 r["listing"] = "25年以上" if ipo and ipo < "2002-01-01" else S.fmt_listing(ipo)   # Yahooの日本株データは2000〜2001年から
         except Exception as e:
             print("JP meta skipped:", e)
-    return {"date": date, "count": len(rows), "rows": rows}, set(codes)
+    sess = {"date": date, "count": len(rows), "rows": rows}
+    if variant == "vcp2" and S.LAST_GATE:
+        sess["breadth"] = dict(S.LAST_GATE)        # 新高値・新安値の数と、米国株の買い控え(gate=False)
+    return sess, set(codes)
 
 
 def export(market, csv_path, out_path, keep, variant="vcp", write_status=True):

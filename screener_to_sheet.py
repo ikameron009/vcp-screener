@@ -402,6 +402,8 @@ def fetch_deepvue(sh):
 # ==================== 市場ごとのブロック構築 ====================
 LAST_BUY_TYPE = {}   # 直近のbuild_blockで BUY した銘柄の種類 {code: "VCP"|"FB"}
 LAST_ORDER = {}      # 直近のbuild_block(variant="vcp2")で 翌営業日の注文条件がある銘柄 {code: vcp_check.make_order(...)}
+LAST_PTS = {}        # 同 VCP2の優先点 {code: (点, [内訳])}(vcp2_rank)
+LAST_GATE = {}       # 同 市場の広がり {nh, nl, n, nhnl, gate}。米国株は gate=False(新高値−新安値がマイナス)なら買い控え
 _EVAL_CACHE = {}     # VCP/VCP2を同じ実行で続けて作るとき価格の取り直しを省く {(market, 母集団): vcp_eval_codes(orders=True)}
 
 
@@ -557,6 +559,26 @@ def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_
     # --- 全銘柄を1リストに統合し、セクター固定順→(米=英字/日=コード)順で並べる ---
     # US該当リストのみ「時価総額/上場」を追加。全市場で末尾に「優先度」列。
     us_meta = load_us_meta(union) if market == "US" else {}
+    # VCP2: 米国株の買い控え(新高値−新安値がマイナス)と、注文の優先点(vcp2_rank。検証 32_summary で採用したルール)
+    LAST_PTS.clear(); LAST_GATE.clear()
+    if variant == "vcp2":
+        import vcp2_rank as R2
+        vcp_eval = dict(vcp_eval)                 # 価格のキャッシュ(VCPと共用)は書き換えない
+        LAST_GATE.update(R2.market_gate(csv_path, market))
+        oc = [c for c in union if (vcp_eval.get(c) or {}).get("order")]
+        try:
+            LAST_PTS.update(R2.us_points(oc, vcp_eval, us_meta, csv_path) if market == "US" else R2.jp_points(oc, csv_path))
+        except Exception as e:
+            print(f"[{market}] 優先点スキップ: {e}")
+        if not LAST_GATE.get("gate", True):
+            for c in oc:
+                o = vcp_eval[c]["order"]
+                if o.get("ok"):
+                    o = dict(o, ok=False, why="買い控え（新高値−新安値がマイナス）")
+                    vcp_eval[c] = dict(vcp_eval[c], order=o)
+                    LAST_ORDER[c] = o
+        print(f"[{market}] VCP2: 注文{len(oc)}銘柄・優先点{len(LAST_PTS)}・新高値−新安値 {LAST_GATE.get('nhnl')}"
+              f"{'(買い控え)' if not LAST_GATE.get('gate', True) else ''}")
     hdr = full_hdr(market)                       # 市場別(US=DV/CMあり+時価総額/上場 / JP=DV/CM無し)
 
     def rs_num(code):
@@ -586,6 +608,9 @@ def build_block(market, csv_path, date=None, deepvue=None, chartmill=None, prev_
             val, disp = rs, ""
         if ev and ev.get("buy"):                 # Buy(ブレイク)は最上位へ
             val = 2000.0 + (sc if gated else rs)
+        if variant == "vcp2" and ev and (ev.get("order") or {}).get("ok"):
+            # VCP2: 翌営業日に買える注文を最上位に、優先点の高い順(同点はRS順)
+            val = 3000.0 + (LAST_PTS.get(code, (0, []))[0] + 20) * 100.0 + rs
         return val, disp
 
     # 並び順(2026-08変更): T1(BUY発火=2000+)→T2(gated=1000+)→T3(監視=RS)の優先度降順のみ。

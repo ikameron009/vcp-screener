@@ -153,7 +153,9 @@ def fpbreak_today(df, swing_len=5, min_legs=2, max_last_dep=12.0, stale_bars=30,
     # 固定ピボット状態(Pine var)
     fp_armed = False; fp_pivot = math.nan; fp_stop = math.nan; fp_count = 0
     fp_contract_prev = False; vcp_pivot_prev = math.nan; vcp_stop_prev = math.nan
-    fp_pivot_endprev = math.nan
+    fp_pivot_endprev = math.nan; fp_armed_endprev = False
+    stage_start = -1          # 最後に終値が200日線の下だった足(=今の上昇の始まりの手前)
+    breaks = []               # ピボットの逆指値に届いた足(20営業日以上離れたものだけ)。「何回目のブレイクか」に使う
     start = 2 * R
     close_prev = c[start - 1] if start >= 1 else math.nan
 
@@ -166,6 +168,12 @@ def fpbreak_today(df, swing_len=5, min_legs=2, max_last_dep=12.0, stale_bars=30,
         return a != b
 
     for t in range(start, n):
+        if math.isnan(sma200[t]) or c[t] < sma200[t]:
+            stage_start = t
+        # 前日の引けでピボット待ち → 当日の高値がピボット+0.1%に届いた = 注文ルールの買い(検証 31 の base_n と同じ数え方)
+        if (fp_armed_endprev and not math.isnan(fp_pivot_endprev) and close_prev <= fp_pivot_endprev
+                and h[t] >= fp_pivot_endprev * (1 + ORDER_TRIG) and (not breaks or t - breaks[-1] >= 20)):
+            breaks.append(t)
         pv = t - R
         if pv - L >= 0 and pv + R < n:
             if B.is_pivot_high(h, pv, L, R):
@@ -220,24 +228,30 @@ def fpbreak_today(df, swing_len=5, min_legs=2, max_last_dep=12.0, stale_bars=30,
             dry_next = (not use_dryup) or (not math.isnan(sma_vol_dw[t]) and not math.isnan(vol50[t])
                                            and vol50[t] > 0 and sma_vol_dw[t] <= vol50[t] * dry_ratio)
             res["next"] = {"armed": bool(fp_armed), "pivot": fp_pivot, "stop": fp_stop, "close": c[t], "dry_ok": bool(dry_next)}
+            # VCP2の優先点に使う値: 何回目のブレイクか(明日買えば) / 52週安値からの倍率 / 直近63日に1日+10%以上の上げ
+            r1 = c[max(1, t - 62):t + 1] / c[max(0, t - 63):t] - 1.0
+            res["feat"] = {"base_n": 1 + sum(1 for b in breaks if b > stage_start),
+                           "ext_low": (c[t] / low252[t]) if low252[t] and not math.isnan(low252[t]) else math.nan,
+                           "jump": bool(len(r1) and np.nanmax(r1) >= 0.10)}
 
         # 次バーへ持ち越し(Pineのシリーズ[1]参照用)
         fp_contract_prev = fp_contract
         vcp_pivot_prev = vcp_pivot; vcp_stop_prev = vcp_stop
-        fp_pivot_endprev = fp_pivot; close_prev = c[t]
+        fp_pivot_endprev = fp_pivot; fp_armed_endprev = fp_armed; close_prev = c[t]
     return res
 
 
 # ============================================================================
 #  翌営業日の注文条件(ピボットの逆指値で買う / 損切りは最後の締まりの安値 / 10%超は見送り)
 # ============================================================================
-# 検証: 03_手法分析/27_trade_rules/t8_buystop.py の (c)。
+# 検証: 03_手法分析/27_trade_rules/t8_buystop.py。日本株=(c)、米国株=(a)(32_summary/SUMMARY.md 追記 2026-10-23)。
 #   買い: 前日の引けで VCP のピボット待ち・引けがピボット以下・出来高ドライアップ → 当日ピボット+0.1%に届いたら買う。
 #         寄りでピボット+3%超なら見送り(=指値の上限)。出来高1.5倍は引けまで分からないので使わない。
-#   損切り: 最後の締まりの安値。(ピボット−安値)÷ピボット > 10% の形は買わない。
+#   損切り: 最後の締まりの安値。日本株は (ピボット−安値)÷ピボット > 10% の形は買わない。米国株は10%超でも買う
+#         (米国株は、採用ルールと組み合わせると10%超も買う方が2016-26・2001-14とも年率・最悪の年が良かった)。
 ORDER_TRIG = 0.001      # 買いの逆指値 = ピボット×(1+これ)
 ORDER_LIMIT = 0.03      # 指値の上限 = ピボット×(1+これ)
-ORDER_MAX_RISK = 0.10   # (ピボット−損切り)÷ピボット がこれを超えたら見送り
+ORDER_MAX_RISK = 0.10   # (ピボット−損切り)÷ピボット がこれを超えたら見送り(日本株だけ)
 
 
 def _jp_tick(px):
@@ -271,7 +285,7 @@ def make_order(nxt, market):
         stp = math.floor(stop * 100 + 1e-9) / 100
     risk = (piv - stop) / piv
     why = ""
-    if risk > ORDER_MAX_RISK:
+    if market == "JP" and risk > ORDER_MAX_RISK:
         why = "損切りまで10%超"
     elif not nxt.get("dry_ok"):
         why = "直前の出来高が多い"
@@ -430,6 +444,7 @@ def vcp_eval_codes(codes, market, chunk=120, orders=False):
                     ev["fb_score"] = fb["score"]     # FBの質(0-100)。表示/優先度の将来拡張用
                 if orders:
                     ev["order"] = make_order(bk.get("next"), market)   # 翌営業日の逆指値注文(ピボット待ちのVCPだけ)
+                    ev["feat"] = bk.get("feat")
                     if ev["order"]:
                         pending[yt] = (df, bk["next"])
                 if ev["valid"] or ev["buy"] or ev.get("order"):   # VCP有効 / Buy発火(VCP/FB) / (VCP2のみ)明日の注文あり の銘柄を返す
